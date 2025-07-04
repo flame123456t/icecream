@@ -8,6 +8,27 @@
       font-family: sans-serif;
       text-align: center;
       padding: 20px;
+
+      /* รูปพื้นหลัง */
+      background-image: url('https://s.isanook.com/he/0/ud/6/30093/sherbet.jpg?ip/crop/w1200h700/q80/jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      color: #333;
+      position: relative;
+      z-index: 0;
+    }
+
+    /* ชั้นโปร่งใสครอบพื้นหลัง */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255,255,255,0.5); /* ปรับความโปร่งใสได้ */
+      z-index: -1;
     }
 
     .grid-container {
@@ -25,6 +46,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       transition: transform 0.2s;
       cursor: pointer;
+      background-color: white;
     }
 
     .ice-cream-card:hover {
@@ -96,49 +118,40 @@
     <img src="https://i.ytimg.com/vi/1vCnGjZzTsU/maxresdefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสวานิลลา">
     <div class="ice-cream-name">วานิลลา</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('chocolate')">
     <img src="https://i.ytimg.com/vi/9L0L20wqeks/sddefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสช็อกโกแลต">
     <div class="ice-cream-name">ช็อกโกแลต</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('strawberry')">
     <img src="https://i.ytimg.com/vi/9F6Hpy8EfLI/sddefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสสตรอว์เบอร์รี">
     <div class="ice-cream-name">สตรอว์เบอร์รี</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('thaiTea')">
     <img src="https://i.ytimg.com/vi/Q3B6nuYyTLs/maxresdefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสชาเย็น">
     <div class="ice-cream-name">ชาเย็น</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('coconutMilk')">
     <img src="https://i.ytimg.com/vi/SiglJGQ1mmM/sddefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสกะทิ">
     <div class="ice-cream-name">กะทิ</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('youngCoconut')">
     <img src="https://i.ytimg.com/vi/3FCev3kSQ04/sddefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสมะพร้าวอ่อน">
     <div class="ice-cream-name">มะพร้าวอ่อน</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('lime')">
     <img src="https://i.ytimg.com/vi/THyXzHDo_MU/maxresdefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสมะนาว">
     <div class="ice-cream-name">มะนาว</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('greenTea')">
     <img src="https://i.ytimg.com/vi/aP3QWOBE1mk/maxresdefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสชาเขียว">
     <div class="ice-cream-name">ชาเขียว</div>
   </div>
-
   <div class="ice-cream-card" onclick="showRecipe('milk')">
     <img src="https://i.ytimg.com/vi/HQZdrjtW4zU/maxresdefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสนมสด">
     <div class="ice-cream-name">นมสด</div>
   </div>
 </div>
 
-<!-- Popup -->
 <div id="recipePopup" class="popup">
   <h3 id="recipeTitle"></h3>
   <ul id="recipeList"></ul>
