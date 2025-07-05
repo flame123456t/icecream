@@ -634,8 +634,6 @@ document.getElementById("addRecipeForm").addEventListener("submit", function (e)
   location.reload();  
 });
 
-});
 </script>
-
 </body>    
 </html>  
