@@ -3,6 +3,40 @@
   <meta charset="UTF-8" />    
   <title>สูตรไอศกรีม</title>    
   <style>  
+  #backToTopBtn {
+  display: none;
+  position: fixed;
+  bottom: 40px;
+  right: 30px;
+  z-index: 10002;
+  font-size: 18px;
+  border: none;
+  outline: none;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  padding: 12px 16px;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+#backToTopBtn:hover {
+  background-color: #1c7c35;
+}
+  .delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: red;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.ice-cream-card {
+  position: relative;
+}
   .menu-toggle {  
   position: fixed;  
   top: 20px;  
@@ -138,7 +172,8 @@ background-color: #222;
 body {
 font-family: sans-serif;
 text-align: center;
-padding: 20px;  /* รูปพื้นหลัง */
+padding: 20px; 
+/* รูปพื้นหลัง */
 background-image: url('https://s.isanook.com/he/0/ud/6/30093/sherbet.jpg?ip/crop/w1200h700/q80/jpg');
 background-size: cover;
 background-position: center;
@@ -150,14 +185,13 @@ z-index: 0;
 min-height: 100vh;
 }
 
-/* ชั้นโปร่งใสครอบพื้นหลัง /
 body::before {
 content: "";
 position: fixed;
 top: 0; left: 0;
 width: 100%;
 height: 100%;
-background-color: rgba(255,255,255,0.5); / ปรับความโปร่งใสได้ */
+background-color: rgba(255,255,255,0.5); 
 z-index: -1;
 }
 
@@ -245,7 +279,8 @@ position: fixed;
 top: 50%;
 left: 50%;
 transform: translate(-50%, -50%);
-z-index: 10001; /* มากกว่า btn /
+z-index: 10001;
+/* มากกว่า btn /
 background: white;
 padding: 20px;
 border-radius: 10px;
@@ -277,16 +312,38 @@ border: 1px solid #666;
 
 </head>    
 <body>  
-    <!-- ปุ่มเปิดเมนู -->  
-<button id="menuToggle" class="menu-toggle">☰ เมนู</button>  <div id="sideMenu" class="side-menu">  
-  <button id="closeMenu" class="close-btn">✖</button>  
+  <button onclick="scrollToTop()" id="backToTopBtn" title="กลับขึ้นบน">️^</button>
+<div id="loginSection" style="text-align: center; margin-top: 50px;">
+  <h2>🔐 เข้าสู่ระบบ</h2>
+  <input type="text" id="usernameInput" placeholder="ชื่อผู้ใช้" style="padding: 8px; border-radius: 8px;"><br><br>
+  <input type="password" id="passwordInput" placeholder="รหัสผ่าน" style="padding: 8px; border-radius: 8px;"><br><br>
+  <button onclick="login()" style="padding: 8px 16px; border-radius: 8px;">เข้าสู่ระบบ</button>
+  <button onclick="showRegister()" style="padding: 8px 16px; border-radius: 8px; margin-left: 10px;">สมัครสมาชิก</button>
+</div>
+
+<div id="registerSection" style="display: none; text-align: center; margin-top: 50px;">
+  <h2>📝 สมัครสมาชิก</h2>
+  <input type="text" id="registerUsername" placeholder="ชื่อผู้ใช้" style="padding: 8px; border-radius: 8px;"><br><br>
+  <input type="password" id="registerPassword" placeholder="รหัสผ่าน" style="padding: 8px; border-radius: 8px;"><br><br>
+  <button onclick="register()" style="padding: 8px 16px; border-radius: 8px;">สมัคร</button>
+  <button onclick="cancelRegister()" style="padding: 8px 16px; border-radius: 8px; margin-left: 10px;">ยกเลิก</button>
+</div>
+
+<!-- ปุ่มเปิดเมนู -->
+<button id="menuToggle" class="menu-toggle">☰ เมนู</button>
+
+<!-- เมนูด้านข้าง -->
+<div id="sideMenu" class="side-menu">
+  <button id="closeMenu" class="close-btn">✖</button>
+  <button onclick="logout()">🚪 ออกจากระบบ</button>
   <button id="toggleFormBtn">➕ เพิ่มสูตรไอศกรีม</button>  
   <button id="darkModeToggle">🌙 โหมดกลางคืน</button>  
   <button id="viewSavedBtn">⭐ ดูสูตรที่บันทึกไว้</button>  
   <button id="viewAllBtn">📋 แสดงสูตรทั้งหมด</button>  
-</div>    <h2>🍨 คลิกที่ไอศกรีมเพื่อดูสูตร  
+</div>  
+  <h2>🍨 เลื่อกไอศกรีมที่ชอบเพื่อดูสูตร  
 <input type="text" id="searchBox" placeholder="ค้นหาชื่อไอศกรีม..." oninput="filterIceCream()" style="padding: 8px; width: 300px; margin-bottom: 20px; border-radius: 8px;">  
-!</h2>   
+</h2>   
     <form id="addRecipeForm" style="margin-bottom: 30px; display: none;">  
   <input type="text" id="customName" placeholder="ชื่อไอศกรีม" required style="padding:8px; border-radius:8px; width:200px;">  
   <input type="text" id="customImage" placeholder="URL รูปภาพ" required style="padding:8px; border-radius:8px; width:250px;">  
@@ -297,7 +354,7 @@ border: 1px solid #666;
 <div class="grid-container">    
   <div class="ice-cream-card" onclick="showRecipe('vanilla')">    
     <img src="https://i.ytimg.com/vi/1vCnGjZzTsU/maxresdefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสวานิลลา">    
-    <div class="ice-cream-name">วานิลลา</div>    
+    <div class="ice-cream-name">วานิลลา</div>       
   </div>    
   <div class="ice-cream-card" onclick="showRecipe('chocolate')">    
     <img src="https://i.ytimg.com/vi/9L0L20wqeks/sddefault.jpg" class="ice-cream-img" alt="ไอศกรีมรสช็อกโกแลต">    
@@ -339,6 +396,7 @@ border: 1px solid #666;
 <button id="saveRecipeBtn" onclick="toggleSaveRecipe()">บันทึกสูตร</button>    
 <button onclick="hidePopup()">ปิด</button>  
 </div>  
+  <div id="userPanel" style="display: none;"></div>
 <script>  
   const recipes = {    
     vanilla: {    
@@ -489,22 +547,23 @@ localStorage.setItem("userRecipes", JSON.stringify(recipes));
 }
 
 function renderUserRecipes() {
-const container = document.querySelector(".grid-container");
-const userRecipes = getUserRecipes();
+  const container = document.querySelector(".grid-container");
+  const userRecipes = getUserRecipes();
 
-userRecipes.forEach(recipe => {  
-  const card = document.createElement("div");  
-  card.className = "ice-cream-card";  
-  card.onclick = () => showUserRecipe(recipe);  
+  userRecipes.forEach(recipe => {
+    const card = document.createElement("div");
+    card.className = "ice-cream-card";
+    
+    card.innerHTML = `
+      <img src="${recipe.image}" class="ice-cream-img" alt="${recipe.name}">
+      <div class="ice-cream-name">${recipe.name}</div>
+      <button class="delete-btn" onclick="event.stopPropagation(); deleteUserRecipe('${recipe.name}')">🗑️ ลบ</button>
+    `;
 
-  card.innerHTML = `  
-    <img src="${recipe.image}" class="ice-cream-img" alt="${recipe.name}">  
-    <div class="ice-cream-name">${recipe.name}</div>  
-  `;  
-
-  container.appendChild(card);  
-});
-
+    card.onclick = () => showUserRecipe(recipe);
+    container.appendChild(card);
+  });
+  
 }
 
 function showUserRecipe(recipe) {
@@ -545,7 +604,7 @@ document.getElementById("darkModeToggle").innerText = "🌙 โหมดกล�
 localStorage.setItem("darkMode", "false");
 }
 }
-
+  checkLogin();
 document.addEventListener("DOMContentLoaded", () => {
 renderUserRecipes();
 
@@ -635,6 +694,106 @@ document.getElementById("addRecipeForm").addEventListener("submit", function (e)
 });
 
 });
+  function deleteUserRecipe(name) {
+  if (!confirm(`คุณต้องการลบสูตร "${name}" หรือไม่?`)) return;
+
+  const updated = getUserRecipes().filter(recipe => recipe.name !== name);
+  saveUserRecipes(updated);
+  location.reload(); // รีโหลดเพื่ออัปเดตหน้าจอ
+}
+function login() {
+  const username = document.getElementById("usernameInput").value.trim();
+  if (!username) {
+    alert("กรุณากรอกชื่อผู้ใช้");
+    return;
+  }
+
+  localStorage.setItem("loggedInUser", username);
+  checkLogin();
+}
+
+function logout() {
+  localStorage.removeItem("loggedInUser");
+  location.reload();
+}
+
+function checkLogin() {
+  const username = localStorage.getItem("loggedInUser");
+  const loginSection = document.getElementById("loginSection");
+  const userPanel = document.getElementById("userPanel");
+  const content = document.querySelectorAll(".grid-container, .menu-toggle, .side-menu, #recipePopup");
+  document.getElementById("addRecipeForm").style.display = "none";
+
+  if (username) {
+    // ไม่ต้องแสดงชื่อผู้ใช้แล้ว
+// document.getElementById("loggedInUser").innerText = username;
+    loginSection.style.display = "none";
+    userPanel.style.display = "block";
+    content.forEach(el => el.style.display = ""); // แสดงเนื้อหา
+  } else {
+    loginSection.style.display = "block";
+    userPanel.style.display = "none";
+    content.forEach(el => el.style.display = "none"); // ซ่อนเนื้อหา
+  }
+}
+function showRegister() {
+  document.getElementById("loginSection").style.display = "none";
+  document.getElementById("registerSection").style.display = "block";
+}
+
+function cancelRegister() {
+  document.getElementById("registerSection").style.display = "none";
+  document.getElementById("loginSection").style.display = "block";
+}
+
+function register() {
+  const username = document.getElementById("registerUsername").value.trim();
+  const password = document.getElementById("registerPassword").value;
+
+  if (!username || !password) {
+    alert("กรุณากรอกชื่อผู้ใช้และรหัสผ่าน");
+    return;
+  }
+
+  const users = JSON.parse(localStorage.getItem("users") || "{}");
+  if (users[username]) {
+    alert("ชื่อผู้ใช้นี้ถูกใช้แล้ว");
+    return;
+  }
+
+  users[username] = password;
+  localStorage.setItem("users", JSON.stringify(users));
+  alert("สมัครสมาชิกสำเร็จ กรุณาเข้าสู่ระบบ");
+
+  cancelRegister();
+}
+
+function login() {
+  const username = document.getElementById("usernameInput").value.trim();
+  const password = document.getElementById("passwordInput").value;
+
+  const users = JSON.parse(localStorage.getItem("users") || "{}");
+  if (users[username] && users[username] === password) {
+    localStorage.setItem("loggedInUser", username);
+    checkLogin();
+  } else {
+    alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+  }
+}
+// ฟังก์ชันเลื่อนกลับขึ้นด้านบน
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// แสดง/ซ่อนปุ่มเมื่อเลื่อนหน้าจอ
+window.onscroll = function () {
+  const btn = document.getElementById("backToTopBtn");
+  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+    btn.style.display = "block";
+  } else {
+    btn.style.display = "none";
+  }
+};
 </script>
 
 </body>    
