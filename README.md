@@ -1,4 +1,4 @@
-
+<!doctype html>
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
@@ -308,63 +308,158 @@ body.dark .btn.secondary{ color:#ffd7e6; }
       });
     }
 
-    function ytEmbed(url){
+    // ---------- video helpers ----------
+    // คืน id หรือข้อมูลสำคัญจาก url/id ทั่วไป (รองรับ YouTube, TikTok)
+    function extractVideoId(urlOrId){
+      if(!urlOrId) return { provider:null, id:null };
+
+      // ถ้าเป็น ID สั้น ๆ (นึกถึง YouTube id) ให้ถือว่าเป็น YouTube id
+      if(/^[A-Za-z0-9_-]{6,}$/.test(urlOrId)) return { provider:'youtube', id: urlOrId };
+
       try{
-        const u = new URL(url);
-        if(u.hostname.includes('youtube.com')){
-          const id = u.searchParams.get('v');
-          if(id) return `https://www.youtube.com/embed/${id}`;
+        const u = new URL(urlOrId);
+        const host = u.hostname.toLowerCase();
+
+        // youtu.be/ID
+        if(host.includes('youtu.be')){
+          const parts = u.pathname.split('/').filter(Boolean);
+          if(parts.length) return { provider:'youtube', id: parts.pop(), url: urlOrId };
         }
-        if(u.hostname.includes('youtu.be')){
-          const id = u.pathname.slice(1);
-          if(id) return `https://www.youtube.com/embed/${id}`;
+
+        // youtube.com (watch?v=ID, /embed/ID, /shorts/ID)
+        if(host.includes('youtube.com')){
+          const v = u.searchParams.get('v');
+          if(v) return { provider:'youtube', id: v, url: urlOrId };
+          const parts = u.pathname.split('/').filter(Boolean);
+          if(parts.length) return { provider:'youtube', id: parts.pop(), url: urlOrId }; // embed/ID or shorts/ID
         }
-        return url; // mp4 หรือแหล่งวิดีโออื่น
-      }catch{ return null; }
+
+        // tiktok.com (ลิงก์มักเป็น /@user/video/ID)
+        if(host.includes('tiktok.com')){
+          const parts = u.pathname.split('/').filter(Boolean);
+          // หา segment ที่เป็นตัวเลข/ตัวอักษรยาวพอที่จะเป็น id
+          // ตัวอย่าง path: @username/video/7123456789012345678
+          const idx = parts.findIndex(p => p === 'video');
+          if(idx >= 0 && parts[idx+1]) return { provider:'tiktok', id: parts[idx+1], url:urlOrId };
+          // บางรูปแบบอาจเป็น /v/ID
+          const vIdx = parts.findIndex(p => p === 'v');
+          if(vIdx >= 0 && parts[vIdx+1]) return { provider:'tiktok', id: parts[vIdx+1], url:urlOrId };
+          // fallback: คืน provider=tiktok กับ url (ไม่เจอ id ชัดเจน)
+          return { provider:'tiktok', id: null, url: urlOrId };
+        }
+
+      }catch(e){
+        // not a valid URL → fallback regex below
+      }
+
+      // fallback: หา pattern ที่น่าจะเป็น id (ตัวเลขยาว ๆ สำหรับ TikTok หรือชุดตัวอักษร 6+ สำหรับ YouTube)
+      const tkt = String(urlOrId).match(/(\d{9,})/); // TikTok id มักเป็นตัวเลขยาว
+      if(tkt) return { provider:'tiktok', id: tkt[1], url: urlOrId };
+
+      const y = String(urlOrId).match(/([A-Za-z0-9_-]{6,})/);
+      if(y) return { provider:'youtube', id: y[1], url: urlOrId };
+
+      return { provider:null, id:null };
     }
 
-    // ---------- Data ----------
-    /** โครงสร้าง recipe
-     * { id, title, category, image, author, ingredients:[...], steps:[...], videoUrl?, _videoObjectUrl? }
-     * image เก็บเป็น dataURL สำหรับความทนทาน
-     */
+    // สร้าง embed snippet หรือคืน src ที่เหมาะสม (ใช้ใน openView)
+    function embedFor(videoUrl){
+      if(!videoUrl) return { type:null, src:null, html:null, provider:null };
 
-       const seed = () => {
+      const info = extractVideoId(videoUrl);
+
+      // YouTube
+      if(info.provider === 'youtube' && info.id){
+        const embedSrc = `https://www.youtube.com/embed/${info.id}`;
+        const html = `<iframe src="${embedSrc}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%; aspect-ratio:16/9; border:0; border-radius:12px; margin-top:10px;"></iframe>`;
+        return { type:'iframe', src: embedSrc, html, provider:'youtube' };
+      }
+
+      // TikTok: คืน blockquote ให้ tiktok embed.js render ให้
+      if(info.provider === 'tiktok'){
+        const tiktokUrl = info.url || (info.id ? `https://www.tiktok.com/@_/_/video/${info.id}` : videoUrl);
+        const useUrl = /^https?:\/\//i.test(videoUrl) ? videoUrl : tiktokUrl;
+        const html = `<blockquote class="tiktok-embed" cite="${useUrl}" data-video="${info.id||''}" style="max-width:605px;min-width:325px;"><section> <a href="${useUrl}">ดูคลิปใน TikTok</a> </section></blockquote>`;
+        return { type:'tiktok', src: useUrl, html, provider:'tiktok' };
+      }
+
+      // ถ้าเป็นไฟล์วิดีโอ (mp4/webm/ogg)
+      try{
+        new URL(videoUrl);
+        if(/\.(mp4|webm|ogg)(\?|$)/i.test(videoUrl)){
+          const html = `<video controls src="${videoUrl}" style="width:100%; border-radius:12px; margin-top:10px;"></video>`;
+          return { type:'video', src: videoUrl, html, provider:'file' };
+        }
+        // ถ้าเป็น URL อื่น ๆ ให้คืนลิงก์เป็น fallback
+        return { type:'link', src: videoUrl, html: `<a href="${videoUrl}" target="_blank" rel="noopener">${videoUrl}</a>`, provider:'link' };
+      }catch(e){
+        return { type:null, src:null, html:null, provider:null };
+      }
+    }
+
+    // เปลี่ยน input ให้เป็นรูปแบบที่เก็บไว้ใน recipe.videoUrl (normalize)
+    function normalizeVideoUrl(input){
+      if(!input) return '';
+      const info = extractVideoId(input);
+      if(info.provider === 'youtube' && info.id){
+        return `https://www.youtube.com/watch?v=${info.id}`;
+      }
+      if(info.provider === 'tiktok' && info.url){
+        return info.url;
+      }
+      try{
+        new URL(input);
+        return input;
+      }catch{
+        return '';
+      }
+    }
+
+    // ---------- Data (seed) ----------
+    const seed = () => {
+      // สร้างรูปตัวอย่าง
       const demoImg = (txt) => `https://dummyimage.com/800x500/ffc2d6/7f2d47.jpg&text=${encodeURIComponent(txt)}`;
-      const YT = (id) => `https://www.youtube.com/watch?v=${id}`;
+
+      // ฟังก์ชันช่วย: ยืดหยุ่น รับทั้ง ID หรือ URL (ใช้ใน seed)
+      const VideoURL = (v) => {
+        if(!v) return '';
+        if(/tiktok\.com/i.test(v)) return v;
+        if(/^https?:\/\//i.test(v)) return v;
+        if(/^[A-Za-z0-9_-]{6,}$/.test(v)) return `https://www.youtube.com/watch?v=${v}`;
+        return v;
+      };
+
       const list = [];
       // ไอศกรีม 
-      list.push({id:uid(), title:'ไอศกรีมนมสด',category:'ไอศกรีม', image:('https://i.ytimg.com/vi/HQZdrjtW4zU/maxresdefault.jpg'), author:'L', ingredients:['นมสด 500 มล.','วิปครีม 200 มล.','น้ำตาล 80 กรัม','วานิลลา 1 ช้อนชา'], steps:['ผสมนม วิปครีม น้ำตาล วานิลลา','คนจนน้ำตาลละลาย','เทใส่ภาชนะ แช่แข็ง 4-6 ชม.','ทุก 30 นาที นำออกมาคน 2-3 ครั้ง'], videoUrl:YT('https://youtu.be/HQZdrjtW4zU?si=PDR3t88XP8RoTKRH')});
-      list.push({id:uid(), title:'ไอศกรีมวานิลลา', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/1vCnGjZzTsU/maxresdefault.jpg'), author:'L', ingredients:['ไข่แดง 4 ฟอง','นม 400 มล.','ครีม 300 มล.','วานิลลา 1 ช้อนชา','น้ำตาล 120 กรัม'], steps:['อุ่นนม+น้ำตาล','เทลงไข่แดง คนจนข้น','ผสมครีมและวานิลลา','ปั่น/แช่แข็ง'], videoUrl:YT('https://youtu.be/1vCnGjZzTsU?si=LchKOeEAxI8u3H7Q')});
-      list.push({id:uid(), title:'ไอศกรีมช็อกโกแลต', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/9L0L20wqeks/sddefault.jpg'), author:'L', ingredients:['ผงโกโก้ 40 กรัม','ช็อกโกแลต 100 กรัม','ครีม 300 มล.','นม 300 มล.','น้ำตาล 100 กรัม'], steps:['อุ่นนม+ครีม','ละลายช็อกโกแลตและโกโก้','แช่ให้เย็น','ปั่น/แช่แข็ง'], videoUrl:YT('https://youtu.be/IoiiNQoBe-Y?si=rM0YbR00BOyoxBv9')});
-      list.push({id:uid(), title:'ไอศกรีมทุเรียน', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/O1qHjuOhgo0/maxresdefault.jpg'), author:'L', ingredients:['ทุเรียน 500 กรัม.','น้ำตาล 100 กรัม','เกลือหยิบมือ','นมจีด 500 ml '], steps:['ละลายน้ำตาลในนมจืด','เติมเกลือ','ใส่เนื้อทุเรียน','แช่แข็ง/คนระหว่างแช่'], videoUrl:YT('https://youtu.be/O1qHjuOhgo0?si=plwJznmUHvsTx28T')});
-      list.push({id:uid(), title:'ไอศกรีมสตรอว์เบอร์รี', category:'ไอศกรีม', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqMi4-V-EikcgTTocWS_wkQXbWgSeoBZzv75etpsZe_in5U0mV2zUNklcX1e2dIUpGLns&usqp=CAU'), author:'Aommy', ingredients:['สตรอว์เบอร์รีบด 300 กรัม','ครีม 300 มล.','นม 200 มล.','น้ำตาล 90 กรัม'], steps:['บดสตรอว์เบอร์รี','ผสมกับครีม นม น้ำตาล','แช่เย็นจัด','ปั่น/แช่แข็ง'], videoUrl:YT('https://youtu.be/mDIsEHfG4HM?si=ahQ6zX9AAxHXsIMd')});
+      list.push({id:uid(), title:'ไอศกรีมนมสด',category:'ไอศกรีม', image:('https://i.ytimg.com/vi/HQZdrjtW4zU/maxresdefault.jpg'), author:'L', ingredients:['นมสด 500 มล.','วิปครีม 200 มล.','น้ำตาล 80 กรัม','วานิลลา 1 ช้อนชา'], steps:['ผสมนม วิปครีม น้ำตาล วานิลลา','คนจนน้ำตาลละลาย','เทใส่ภาชนะ แช่แข็ง 4-6 ชม.','ทุก 30 นาที นำออกมาคน 2-3 ครั้ง'], videoUrl: VideoURL('https://youtu.be/HQZdrjtW4zU?si=PD')});
+      list.push({id:uid(), title:'ไอศกรีมวานิลลา', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/1vCnGjZzTsU/maxresdefault.jpg'), author:'L', ingredients:['ไข่แดง 4 ฟอง','นม 400 มล.','ครีม 300 มล.','วานิลลา 1 ช้อนชา','น้ำตาล 120 กรัม'], steps:['อุ่นนม+น้ำตาล','เทลงไข่แดง คนจนข้น','ผสมครีมและวานิลลา','ปั่น/แช่แข็ง'], videoUrl: VideoURL('https://youtu.be/1vCnGjZzTsU?si=LchKOeEAxI8u3H7Q')});
+      list.push({id:uid(), title:'ไอศกรีมช็อกโกแลต', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/9L0L20wqeks/sddefault.jpg'), author:'L', ingredients:['ผงโกโก้ 40 กรัม','ช็อกโกแลต 100 กรัม','ครีม 300 มล.','นม 300 มล.','น้ำตาล 100 กรัม'], steps:['อุ่นนม+ครีม','ละลายช็อกโกแลตและโกโก้','แช่ให้เย็น','ปั่น/แช่แข็ง'], videoUrl: VideoURL('https://youtu.be/IoiiNQoBe-Y?si=rM0YbR00BOyoxBv9')});
+      list.push({id:uid(), title:'ไอศกรีมทุเรียน', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/O1qHjuOhgo0/maxresdefault.jpg'), author:'L', ingredients:['ทุเรียน 500 กรัม.','น้ำตาล 100 กรัม','เกลือหยิบมือ','นมจีด 500 ml '], steps:['ละลายน้ำตาลในนมจืด','เติมเกลือ','ใส่เนื้อทุเรียน','แช่แข็ง/คนระหว่างแช่'], videoUrl: VideoURL('https://youtu.be/O1qHjuOhgo0?si=plwJznmUHvsTx28T')});
+      list.push({id:uid(), title:'ไอศกรีมสตรอว์เบอร์รี', category:'ไอศกรีม', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqMi4-V-EikcgTTocWS_wkQXbWgSeoBZzv75etpsZe_in5U0mV2zUNklcX1e2dIUpGLns&usqp=CAU'), author:'Aommy', ingredients:['สตรอว์เบอร์รีบด 300 กรัม','ครีม 300 มล.','นม 200 มล.','น้ำตาล 90 กรัม'], steps:['บดสตรอว์เบอร์รี','ผสมกับครีม นม น้ำตาล','แช่เย็นจัด','ปั่น/แช่แข็ง'], videoUrl: VideoURL('https://youtu.be/mDIsEHfG4HM?si=ahQ6zX9AAxHXsIMd')});
       // เค้ก 
-      list.push({id:uid(), title:'เค้กส้มฉ่ำ', category:'เค้ก', image:('https://static.cdntap.com/tap-assets-prod/wp-content/uploads/sites/25/2022/02/orange-cake-lead.jpg'), author:'L', ingredients:['แป้งเค้ก 200 กรัม','ไข่ 3 ฟอง','น้ำส้ม 120 มล.','เนย 100 กรัม','น้ำตาล 120 กรัม'], steps:['ตีไข่กับน้ำตาล','ใส่แป้งและเนย','เติมน้ำส้ม','อบ 170°C 30-35 นาที'], videoUrl:YT('https://youtu.be/AMC6TL3tHCU?si=huKpg0OzOfQkV6Wv')});
-      list.push({id:uid(), title:'ชิฟฟอนชาไทย', category:'เค้ก', image:('https://f.ptcdn.info/392/080/000/rtd62o22gbmJb6tO8I9bo-o.jpg'), author:'L', ingredients:['แป้งเค้ก 180 กรัม','ชาไทยเข้ม 150 มล.','ไข่ 4 ฟอง','น้ำตาล 130 กรัม','น้ำมัน 60 มล.'], steps:['ผสมของเหลว','ร่อนแป้ง','ตีไข่ขาวตั้งยอด','ตะล่อมรวมกัน','อบ 170°C 35 นาที'], videoUrl:YT('https://youtu.be/VWysSH5Ypm0?si=5QXzncgyIS_DEppM')});
-      list.push({id:uid(), title:'เค้กช็อกโกแลตหน้านิ่ม', category:'เค้ก', image:('https://i.ytimg.com/vi/bIvRLl-R1Ho/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 200 กรัม','โกโก้ 30 กรัม','นม 200 มล.','ไข่ 3 ฟอง','น้ำตาล 150 กรัม'], steps:['ผสมส่วนแห้ง','เติมของเหลว','อบ 170°C 30 นาที','ทำหน้าช็อกโกแลต เทราด'], videoUrl:YT('https://youtu.be/bIvRLl-R1Ho?si=rGTm5KYOztBAFjNh')});
-      list.push({id:uid(), title:'ชีสเค้กอบ', category:'เค้ก', image:('https://recipe.sgethai.com/wp-content/uploads/2025/04/cover-basque-burnt-cheese-cake.webp'), author:'L', ingredients:['ครีมชีส 500 กรัม','น้ำตาล 120 กรัม','ไข่ 3 ฟอง','วิปครีม 150 มล.','บิสกิตบด 150 กรัม'], steps:['ทำฐานบิสกิต','ตีครีมชีสกับน้ำตาล','เติมไข่และครีม','อบ 160°C 45-55 นาที'], videoUrl:YT('https://youtu.be/xLiMoHmYR14?si=x6e_gcfk3B1Df8Jb')});
-      list.push({id:uid(), title:'เค้กกล้วยหอม', category:'เค้ก', image:('https://i.ytimg.com/vi/lwXwD1WG3e4/maxresdefault.jpg'), author:'L', ingredients:['กล้วย 3 ผลสุก','แป้ง 200 กรัม','ไข่ 2 ฟอง','น้ำตาล 120 กรัม','น้ำมัน 80 มล.'], steps:['บดกล้วย','ผสมส่วนผสมทั้งหมด','อบ 175°C 35-40 นาที'], videoUrl:YT('https://youtu.be/FV47VIgvYEs?si=0qw_0Aiwl4wAI48C')});
+      list.push({id:uid(), title:'เค้กส้มฉ่ำ', category:'เค้ก', image:('https://static.cdntap.com/tap-assets-prod/wp-content/uploads/sites/25/2022/02/orange-cake-lead.jpg'), author:'L', ingredients:['แป้งเค้ก 200 กรัม','ไข่ 3 ฟอง','น้ำส้ม 120 มล.','เนย 100 กรัม','น้ำตาล 120 กรัม'], steps:['ตีไข่กับน้ำตาล','ใส่แป้งและเนย','เติมน้ำส้ม','อบ 170°C 30-35 นาที'], videoUrl: VideoURL('https://youtu.be/AMC6TL3tHCU?si=huKpg0OzOfQkV6Wv')});
+      list.push({id:uid(), title:'ชิฟฟอนชาไทย', category:'เค้ก', image:('https://f.ptcdn.info/392/080/000/rtd62o22gbmJb6tO8I9bo-o.jpg'), author:'L', ingredients:['แป้งเค้ก 180 กรัม','ชาไทยเข้ม 150 มล.','ไข่ 4 ฟอง','น้ำตาล 130 กรัม','น้ำมัน 60 มล.'], steps:['ผสมของเหลว','ร่อนแป้ง','ตีไข่ขาวตั้งยอด','ตะล่อมรวมกัน','อบ 170°C 35 นาที'], videoUrl: VideoURL('https://youtu.be/VWysSH5Ypm0?si=5QXzncgyIS_DEppM')});
+      list.push({id:uid(), title:'เค้กช็อกโกแลตหน้านิ่ม', category:'เค้ก', image:('https://i.ytimg.com/vi/bIvRLl-R1Ho/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 200 กรัม','โกโก้ 30 กรัม','นม 200 มล.','ไข่ 3 ฟอง','น้ำตาล 150 กรัม'], steps:['ผสมส่วนแห้ง','เติมของเหลว','อบ 170°C 30 นาที','ทำหน้าช็อกโกแลต เทราด'], videoUrl: VideoURL('https://youtu.be/bIvRLl-R1Ho?si=rGTm5KYOztBAFjNh')});
+      list.push({id:uid(), title:'ชีสเค้กอบ', category:'เค้ก', image:('https://recipe.sgethai.com/wp-content/uploads/2025/04/cover-basque-burnt-cheese-cake.webp'), author:'L', ingredients:['ครีมชีส 500 กรัม','น้ำตาล 120 กรัม','ไข่ 3 ฟอง','วิปครีม 150 มล.','บิสกิตบด 150 กรัม'], steps:['ทำฐานบิสกิต','ตีครีมชีสกับน้ำตาล','เติมไข่และครีม','อบ 160°C 45-55 นาที'], videoUrl: VideoURL('https://youtu.be/xLiMoHmYR14?si=x6e_gcfk3B1Df8Jb')});
+      list.push({id:uid(), title:'เค้กกล้วยหอม', category:'เค้ก', image:('https://i.ytimg.com/vi/lwXwD1WG3e4/maxresdefault.jpg'), author:'L', ingredients:['กล้วย 3 ผลสุก','แป้ง 200 กรัม','ไข่ 2 ฟอง','น้ำตาล 120 กรัม','น้ำมัน 80 มล.'], steps:['บดกล้วย','ผสมส่วนผสมทั้งหมด','อบ 175°C 35-40 นาที'], videoUrl: VideoURL('https://youtu.be/FV47VIgvYEs?si=0qw_0Aiwl4wAI48C')});
       // น้ำปั่น 
-      list.push({id:uid(), title:'สมูทตี้สตรอว์เบอร์รี-กล้วย', category:'น้ำปั่น', image:('https://today-obs.line-scdn.net/0hwMhlixjAKGJVFTxNyu1XNW1DJBNmczJrd3thDHlFIwd-OW09OnF7AXZAIU5wdz80dSFnU3IRI1t-JDtnPA/w280'), author:'L', ingredients:['สตรอว์เบอร์รี 1 ถ้วย','กล้วย 1 ผล','โยเกิร์ต 1/2 ถ้วย','น้ำผึ้ง 1 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ใส่ทุกอย่างลงเครื่องปั่น','ปั่นจนเนียน เสิร์ฟทันที'], videoUrl:YT('https://youtu.be/1EjS3VR77wE?si=HtdqpbAbMZxB4RRz')});
-      list.push({id:uid(), title:'มะม่วงโยเกิร์ตปั่น', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_emoKzscYjbq-q9Q848TV3hCmaS5EUvbPcw&s'), author:'L', ingredients:['มะม่วงสุก 1 ถ้วย','โยเกิร์ต 1/2 ถ้วย','นม 1/2 ถ้วย','น้ำผึ้ง 1 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทุกอย่างเข้าด้วยกัน','ชิมรส ปรับหวาน'], videoUrl:YT('https://youtu.be/R0XLH2mgsBk?si=ATwxQu-efCmEZDWL')}) 
-      list.push({id:uid(), title:'แตงโมปั่นเย็นฉ่ำ', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC-JFVpW5P5AHMRgMywgI5QKV3U6lcbxWgFA&s'), author:'L', ingredients:['แตงโมหั่น 2 ถ้วย','น้ำเชื่อม 1-2 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทั้งหมด','เสิร์ฟพร้อมใบสะระแหน่'], videoUrl:YT('https://youtu.be/2ttVIkPQFwc?si=TgBhB0NQHZt_PVKY')});
-      list.push({id:uid(), title:'สับปะรดมินต์ปั่น', category:'น้ำปั่น', image:('https://i.ytimg.com/vi/rerMjL21ceg/mqdefault.jpg'), author:'L', ingredients:['สับปะรด 1 ถ้วย','ใบมินต์ 6-8 ใบ','โซดา 1/2 ถ้วย','น้ำแข็ง'], steps:['ปั่นสับปะรดกับน้ำแข็ง','เทใส่แก้ว เติมโซดาและมินต์'], videoUrl:YT('https://youtu.be/LKasigS4r5c?si=iYpimpipivSM6Vbs')});
-      list.push({id:uid(), title:'กาแฟปั่นคาราเมล', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5z6CKn33iksAXpE4IXpDR4lSRQy2FNHFBCw&s'), author:'L', ingredients:['เอสเปรสโซ 1 ช็อต','นม 1/2 ถ้วย','คาราเมลไซรัป 2 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทั้งหมดจนเข้ากัน','ราดคาราเมลเพิ่มได้ตามชอบ'], videoUrl:YT('https://youtu.be/HniMRESObvE?si=69Y9fFU0yIN9f5Zm')});
+      list.push({id:uid(), title:'สมูทตี้สตรอว์เบอร์รี-กล้วย', category:'น้ำปั่น', image:('https://today-obs.line-scdn.net/0hwMhlixjAKGJVFTxNyu1XNW1DJBNmczJrd3thDHlFIwd-OW09OnF7AXZAIU5wdz80dSFnU3IRI1t-JDtnPA/w280'), author:'L', ingredients:['สตรอว์เบอร์รี 1 ถ้วย','กล้วย 1 ผล','โยเกิร์ต 1/2 ถ้วย','น้ำผึ้ง 1 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ใส่ทุกอย่างลงเครื่องปั่น','ปั่นจนเนียน เสิร์ฟทันที'], videoUrl: VideoURL('https://youtu.be/1EjS3VR77wE?si=HtdqpbAbMZxB4RRz')});
+      list.push({id:uid(), title:'มะม่วงโยเกิร์ตปั่น', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_emoKzscYjbq-q9Q848TV3hCmaS5EUvbPcw&s'), author:'L', ingredients:['มะม่วงสุก 1 ถ้วย','โยเกิร์ต 1/2 ถ้วย','นม 1/2 ถ้วย','น้ำผึ้ง 1 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทุกอย่างเข้าด้วยกัน','ชิมรส ปรับหวาน'], videoUrl:VideoURL('https://youtu.be/R0XLH2mgsBk?si=ATwxQu-efCmEZDWL')}) 
+      list.push({id:uid(), title:'แตงโมปั่นเย็นฉ่ำ', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC-JFVpW5P5AHMRgMywgI5QKV3U6lcbxWgFA&s'), author:'L', ingredients:['แตงโมหั่น 2 ถ้วย','น้ำเชื่อม 1-2 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทั้งหมด','เสิร์ฟพร้อมใบสะระแหน่'], videoUrl:VideoURL('https://youtu.be/2ttVIkPQFwc?si=TgBhB0NQHZt_PVKY')});
+      list.push({id:uid(), title:'สับปะรดมินต์ปั่น', category:'น้ำปั่น', image:('https://i.ytimg.com/vi/rerMjL21ceg/mqdefault.jpg'), author:'L', ingredients:['สับปะรด 1 ถ้วย','ใบมินต์ 6-8 ใบ','โซดา 1/2 ถ้วย','น้ำแข็ง'], steps:['ปั่นสับปะรดกับน้ำแข็ง','เทใส่แก้ว เติมโซดาและมินต์'], videoUrl:VideoURL('https://youtu.be/LKasigS4r5c?si=iYpimpipivSM6Vbs')});
+      list.push({id:uid(), title:'กาแฟปั่นคาราเมล', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5z6CKn33iksAXpE4IXpDR4lSRQy2FNHFBCw&s'), author:'L', ingredients:['เอสเปรสโซ 1 ช็อต','นม 1/2 ถ้วย','คาราเมลไซรัป 2 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทั้งหมดจนเข้ากัน','ราดคาราเมลเพิ่มได้ตามชอบ'], videoUrl:VideoURL('https://youtu.be/HniMRESObvE?si=69Y9fFU0yIN9f5Zm')});
       // คุกกี้ 
-      list.push({id:uid(), title:'คุกกี้ช็อกชิพ', category:'คุกกี้', image:('https://i.ytimg.com/vi/_7KghXqc4Qk/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 220 กรัม','เนย 120 กรัม','น้ำตาล 120 กรัม','ไข่ 1 ฟอง','ช็อกชิพ 120 กรัม'], steps:['ตีเนยกับน้ำตาล','ใส่ไข่และแป้ง','ใส่ช็อกชิพ','อบ 180°C 10-12 นาที'], videoUrl:YT('https://youtu.be/dzkfeVFnV4A?si=atF2LoPo7m0jID74')});
-      list.push({id:uid(), title:'คุกกี้โอ๊ตลูกเกด', category:'คุกกี้', image:('https://i.ytimg.com/vi/ZXHP-3si_hU/maxresdefault.jpg'), author:'L', ingredients:['โอ๊ต 150 กรัม','แป้ง 100 กรัม','เนย 100 กรัม','น้ำตาล 90 กรัม','ลูกเกด 80 กรัม'], steps:['ผสมส่วนผสมทั้งหมด','ตักวางถาด','อบ 175°C 12-15 นาที'], videoUrl:YT('https://youtu.be/OaQy40o7I8A?si=dNqprgWvuDpr4saW')});
-      list.push({id:uid(), title:'คุกกี้งาขี้ม่อน', category:'คุกกี้', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaW1eXOfOloNq6OklSyR2m5ryFzMKrdTzbZw&s'), author:'L', ingredients:['แป้ง 200 กรัม','งาขี้ม่อน 50 กรัม','น้ำตาล 80 กรัม','เนย 120 กรัม','ไข่ 1 ฟอง'], steps:['ผสมส่วนผสม','ปั้นกดแบน','อบ 175°C 12 นาที'], videoUrl:YT('https://youtu.be/1wE_QgEF2uk?si=J6gCNqi-GJ7nA_CD')});
-      list.push({id:uid(), title:'คุกกี้เนยวานิลลา', category:'คุกกี้', image:('https://i.ytimg.com/vi/I1tsliG101Y/maxresdefault.jpg'), author:'L ', ingredients:['แป้ง 220 กรัม','เนย 150 กรัม','น้ำตาลไอซิ่ง 80 กรัม','วานิลลา 1 ช้อนชา','ไข่ 1 ฟอง'], steps:['ตีเนย+ไอซิ่ง','ใส่ไข่+วานิลลา','ใส่แป้ง','อบ 170°C 12-15 นาที'], videoUrl:YT('https://youtu.be/Y9UdCT43CAA?si=VAmwnKMAwNHcNf8_')});
-      list.push({id:uid(), title:'คุกกี้มัทฉะไวท์ช็อก', category:'คุกกี้', image:('https://i.ytimg.com/vi/yqR0STrOcKk/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 220 กรัม','ผงมัทฉะ 10 กรัม','เนย 150 กรัม','น้ำตาล 100 กรัม','ไวท์ช็อก 120 กรัม'], steps:['ผสมแห้ง','ตีเนยกับน้ำตาล','รวมส่วนผสม','อบ 175°C 12 นาที'], videoUrl:YT('https://youtu.be/2nrwOB7DkJc?si=yzEwWBUatr2E_DmU')});
+      list.push({id:uid(), title:'คุกกี้ช็อกชิพ', category:'คุกกี้', image:('https://i.ytimg.com/vi/_7KghXqc4Qk/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 220 กรัม','เนย 120 กรัม','น้ำตาล 120 กรัม','ไข่ 1 ฟอง','ช็อกชิพ 120 กรัม'], steps:['ตีเนยกับน้ำตาล','ใส่ไข่และแป้ง','ใส่ช็อกชิพ','อบ 180°C 10-12 นาที'], videoUrl:VideoURL('https://youtu.be/dzkfeVFnV4A?si=atF2LoPo7m0jID74')});
+      list.push({id:uid(), title:'คุกกี้โอ๊ตลูกเกด', category:'คุกกี้', image:('https://i.ytimg.com/vi/ZXHP-3si_hU/maxresdefault.jpg'), author:'L', ingredients:['โอ๊ต 150 กรัม','แป้ง 100 กรัม','เนย 100 กรัม','น้ำตาล 90 กรัม','ลูกเกด 80 กรัม'], steps:['ผสมส่วนผสมทั้งหมด','ตักวางถาด','อบ 175°C 12-15 นาที'], videoUrl:VideoURL('https://youtu.be/OaQy40o7I8A?si=dNqprgWvuDpr4saW')});
+      list.push({id:uid(), title:'คุกกี้งาขี้ม่อน', category:'คุกกี้', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaW1eXOfOloNq6OklSyR2m5ryFzMKrdTzbZw&s'), author:'L', ingredients:['แป้ง 200 กรัม','งาขี้ม่อน 50 กรัม','น้ำตาล 80 กรัม','เนย 120 กรัม','ไข่ 1 ฟอง'], steps:['ผสมส่วนผสม','ปั้นกดแบน','อบ 175°C 12 นาที'], videoUrl:VideoURL('https://youtu.be/1wE_QgEF2uk?si=J6gCNqi-GJ7nA_CD')});
+      list.push({id:uid(), title:'คุกกี้เนยวานิลลา', category:'คุกกี้', image:('https://i.ytimg.com/vi/I1tsliG101Y/maxresdefault.jpg'), author:'L ', ingredients:['แป้ง 220 กรัม','เนย 150 กรัม','น้ำตาลไอซิ่ง 80 กรัม','วานิลลา 1 ช้อนชา','ไข่ 1 ฟอง'], steps:['ตีเนย+ไอซิ่ง','ใส่ไข่+วานิลลา','ใส่แป้ง','อบ 170°C 12-15 นาที'], videoUrl:VideoURL('https://youtu.be/Y9UdCT43CAA?si=VAmwnKMAwNHcNf8_')});
+      list.push({id:uid(), title:'คุกกี้มัทฉะไวท์ช็อก', category:'คุกกี้', image:('https://i.ytimg.com/vi/yqR0STrOcKk/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 220 กรัม','ผงมัทฉะ 10 กรัม','เนย 150 กรัม','น้ำตาล 100 กรัม','ไวท์ช็อก 120 กรัม'], steps:['ผสมแห้ง','ตีเนยกับน้ำตาล','รวมส่วนผสม','อบ 175°C 12 นาที'], videoUrl:VideoURL('https://youtu.be/2nrwOB7DkJc?si=yzEwWBUatr2E_DmU')});
       return list.map(r=>({...r, image:r.image }));
     };
 
-
-function loadRecipes(){
+    function loadRecipes(){
       const raw = localStorage.getItem(STORAGE_KEY);
       if(raw){ try{ return JSON.parse(raw); }catch{ return []; } }
-      // สร้าง seed พร้อมแปลงรูปเป็น dataURL ด้วย fetch -> blob -> base64 (ข้ามเพื่อความเร็ว: ใช้ลิงก์โดยตรง)
       return seed();
     }
 
@@ -390,25 +485,25 @@ function loadRecipes(){
 
     function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
-   function cardTemplate(r){
-  const isFav = favs.has(r.id);
-  return `
-    <article class="card" data-id="${r.id}">
-      <div class="thumb">
-        <img loading="lazy" src="${r.image}" alt="${r.title}" data-open="${r.id}">
-        <span class="cat-chip">${r.category}</span>
-      </div>
-      <div class="card-body">
-        <div class="avatar">${initials(r.author)}</div>
-        <div class="info">
-          <h3 class="name">${r.title}</h3>
-          <div class="by">โดย ${r.author}</div>
-        </div>
-        <button class="heart ${isFav?'fav':''}" title="กดหัวใจ" data-like>❤</button>
-      </div>
-    </article>
-  `;
-}
+    function cardTemplate(r){
+      const isFav = favs.has(r.id);
+      return `
+        <article class="card" data-id="${r.id}">
+          <div class="thumb">
+            <img loading="lazy" src="${r.image}" alt="${r.title}" data-open="${r.id}">
+            <span class="cat-chip">${r.category}</span>
+          </div>
+          <div class="card-body">
+            <div class="avatar">${initials(r.author)}</div>
+            <div class="info">
+              <h3 class="name">${r.title}</h3>
+              <div class="by">โดย ${r.author}</div>
+            </div>
+            <button class="heart ${isFav?'fav':''}" title="กดหัวใจ" data-like>❤</button>
+          </div>
+        </article>
+      `;
+    }
 
     function render(){
       let list = recipes.slice();
@@ -444,18 +539,56 @@ function loadRecipes(){
 
       // วิดีโอ
       viewVideoWrap.innerHTML = '';
+
+      // ถ้ามีไฟล์อัปโหลด (object URL) เล่นตรงๆ
       if(r._videoObjectUrl){
         const v = document.createElement('video');
         v.controls = true; v.src = r._videoObjectUrl; v.style.width='100%'; v.style.borderRadius='12px'; v.style.marginTop='10px';
         viewVideoWrap.appendChild(v);
-      } else if(r.videoUrl){    
-                const src = ytEmbed(r.videoUrl);
-        if(src && src.includes('youtube.com/embed/')){
-          const ifr = document.createElement('iframe');
-          ifr.src = src; ifr.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'; ifr.allowFullscreen = true; ifr.style.width='100%'; ifr.style.aspectRatio='16/9'; ifr.style.border='0'; ifr.style.borderRadius='12px'; ifr.style.marginTop='10px';
-          viewVideoWrap.appendChild(ifr);
-        }else if(src){
-          const v = document.createElement('video'); v.controls = true; v.src = src; v.style.width='100%'; v.style.borderRadius='12px'; v.style.marginTop='10px'; viewVideoWrap.appendChild(v);
+
+      } else if(r.videoUrl){
+        const emb = embedFor(r.videoUrl);
+        console.log('DEBUG: recipe.videoUrl ->', r.videoUrl, ' embedFor ->', emb);
+
+        if(emb && emb.html){
+          // แทรก HTML (iframe / blockquote / video)
+          viewVideoWrap.insertAdjacentHTML('beforeend', emb.html);
+
+          // ถ้าเป็น TikTok ให้โหลดสคริปต์ของ TikTok เพื่อ render blockquote
+          if(emb.provider === 'tiktok'){
+            if(!document.querySelector('script[src="https://www.tiktok.com/embed.js"]')){
+              const s = document.createElement('script');
+              s.src = 'https://www.tiktok.com/embed.js';
+              s.async = true;
+              document.body.appendChild(s);
+            } else {
+              // ถ้ามีแล้ว ลอง re-insert เพื่อให้สคริปต์รันอีกครั้ง (บางเวอร์ชันจะสแกนตอนโหลดเท่านั้น)
+              try{
+                const existing = document.querySelector('script[src="https://www.tiktok.com/embed.js"]');
+                if(existing){
+                  existing.parentNode.removeChild(existing);
+                  const s2 = document.createElement('script');
+                  s2.src = 'https://www.tiktok.com/embed.js';
+                  s2.async = true;
+                  document.body.appendChild(s2);
+                }
+              }catch(e){
+                // ignore
+              }
+            }
+          }
+        } else {
+          // fallback: ถ้า embedFor คืน type video ให้สร้าง video element
+          if(emb && emb.type === 'video' && emb.src){
+            const v = document.createElement('video');
+            v.controls = true; v.src = emb.src; v.style.width='100%'; v.style.borderRadius='12px'; v.style.marginTop='10px';
+            viewVideoWrap.appendChild(v);
+          } else {
+            const p = document.createElement('div');
+            p.className = 'meta';
+            p.textContent = 'ไม่สามารถโหลดวิดีโอได้ (ลิงก์ไม่ถูกต้องหรือถูกจำกัดการฝัง)';
+            viewVideoWrap.appendChild(p);
+          }
         }
       }
 
@@ -495,7 +628,14 @@ function loadRecipes(){
 
       const image = await toBase64(imageFile);
       const rec = { id:uid(), title, category, author, image, ingredients, steps };
-      if(videoUrl) rec.videoUrl = videoUrl;
+      if(videoUrl){
+        const normalized = normalizeVideoUrl(videoUrl);
+        if(!normalized){
+          alert('ลิงก์วิดีโอไม่ถูกต้อง กรุณาตรวจสอบ (รองรับ YouTube/TikTok หรือไฟล์ mp4)');
+          return;
+        }
+        rec.videoUrl = normalized;
+      }
       if(videoFile && videoFile.size){
         // ไม่เก็บถาวรใน localStorage แต่เล่นในรอบนี้ได้
         rec._videoObjectUrl = URL.createObjectURL(videoFile);
@@ -539,31 +679,31 @@ function loadRecipes(){
     });
 
     // คลิกในกริด: like / open
-   grid.addEventListener('click', (e) => {
-  const likeBtn = e.target.closest('[data-like]');
-  const img = e.target.closest('img'); // <-- เปลี่ยนจาก data-open
-  const card = e.target.closest('.card');
-  if (!card) return;
+    grid.addEventListener('click', (e) => {
+      const likeBtn = e.target.closest('[data-like]');
+      const img = e.target.closest('img');
+      const card = e.target.closest('.card');
+      if (!card) return;
 
-  const id = card.dataset.id;
+      const id = card.dataset.id;
 
-  // กดหัวใจ
-  if (likeBtn) {
-    if (favs.has(id)) favs.delete(id);
-    else favs.add(id);
-    saveFavs();
-    render();
-    return;
-  }
+      // กดหัวใจ
+      if (likeBtn) {
+        if (favs.has(id)) favs.delete(id);
+        else favs.add(id);
+        saveFavs();
+        render();
+        return;
+      }
 
-  // กดรูป
-  if (img) {
-    openView(id);
-    return;
-  }
-});
+      // กดรูป
+      if (img) {
+        openView(id);
+        return;
+      }
+    });
 
-    // ปิดโมดอล
+    // ปิดโมดอล (คลิกที่ backdrop)
     viewModal.addEventListener('click', (e)=>{ if(e.target.hasAttribute('data-close-modal')) closeView(); });
     addModal.addEventListener('click', (e)=>{ if(e.target.hasAttribute('data-close-add')) closeAdd(); });
 
