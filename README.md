@@ -1,734 +1,1901 @@
-
+<!doctype html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>แชร์สูตรไอศกรีม • ชมพูพาสเทล</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+ <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ร้านค้าออนไลน์หน้าเดียว</title><!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script><!-- Canva SDKs -->
+  <script src="/_sdk/element_sdk.js"></script>
   <style>
-    :root{
-      /* พาสเทลชมพู */
-      --bg:#fff7fb;               /* พื้นหลังหลัก */
-      --surface:#fff;              /* การ์ด/พื้นผิว */
-      --text:#2b2b2b;             /* ตัวอักษร */
-      --muted:#786d77;            /* ตัวอักษรรอง */
-      --brand:#ff7aa2;            /* ชมพูพาสเทลหลัก */
-      --brand-2:#ffc2d6;          /* ชมพูอ่อน */
-      --brand-3:#ffe6ef;          /* ชมพูจาง */
-      --accent:#ffd166;           /* เหลืองพาสเทล (เน้นเล็กน้อย) */
-      --success:#7bd389;          /* เขียวพาสเทล */
-      --danger:#ff6b6b;           /* แดงพาสเทล */
-      --border:#f2e8ee;           /* เส้นขอบจาง */
-      --shadow: 0 10px 30px rgba(255, 122, 162, 0.15);
+    body {
+      box-sizing: border-box;
     }
-    body.dark{
-      --bg:#1b1a1f;
-      --surface:#23222a;
-      --text:#f3eef3;
-      --muted:#c7becb;
-      --brand:#ff86b0;
-      --brand-2:#3a2d36;
-      --brand-3:#2a232a;
-      --accent:#ffd166;
-      --success:#8be09b;
-      --danger:#ff8080;
-      --border:#34313a;
-      --shadow: 0 10px 30px rgba(0,0,0,0.25);
-    }*{ box-sizing: border-box; }
-html,body{ height:100%; }
-body{
-  margin:0; background:var(--bg); color:var(--text); font-family:'Noto Sans Thai', system-ui, sans-serif; line-height:1.4;
-}
-
-/* Header */
-header{
-  position:sticky; top:0; z-index:1000; backdrop-filter:saturate(140%) blur(6px);
-  background:linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,255,255,0.55)) ;
-}
-body.dark header{ background:linear-gradient(180deg, rgba(35,34,42,0.75), rgba(35,34,42,0.55)); }
-.bar{
-  display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border);
-}
-.menu-btn{
-  appearance:none; border:0; background:var(--brand); color:#fff; padding:10px 12px; border-radius:14px; box-shadow:var(--shadow);
-  display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-weight:600;
-}
-.menu-btn .icon{ width:18px; height:2px; background:#fff; position:relative; border-radius:2px; }
-.menu-btn .icon::before,.menu-btn .icon::after{ content:""; position:absolute; left:0; width:18px; height:2px; background:#fff; border-radius:2px; }
-.menu-btn .icon::before{ top:-6px; } .menu-btn .icon::after{ top:6px; }
-
-.title{ font-weight:800; letter-spacing:0.2px; }
-.spacer{ flex:1; }
-
-.theme-toggle{
-  appearance:none; border:1px solid var(--border); background:var(--surface); color:var(--text); padding:10px 12px; border-radius:14px; cursor:pointer; font-weight:600;
-}
-
-/* Category Tabs */
-.tabs{ display:flex; gap:8px; padding:12px 16px; overflow:auto hidden; border-bottom:1px solid var(--border); }
-.tab{ background:var(--brand-3); color:#7f2d47; border:1px solid var(--border); padding:8px 14px; border-radius:999px; cursor:pointer; white-space:nowrap; font-weight:600; }
-.tab.active{ background:var(--brand); color:#fff; box-shadow:var(--shadow); border-color:transparent; }
-
-/* Layout */
-.container{ padding:16px; max-width:1100px; margin:0 auto; }
-
-/* Cards */
-.grid{ display:grid; grid-template-columns:repeat(1, 1fr); gap:16px; }
-@media(min-width:640px){ .grid{ grid-template-columns:repeat(2, 1fr);} }
-@media(min-width:980px){ .grid{ grid-template-columns:repeat(3, 1fr);} }
-
-.card{
-  background:var(--surface); border:1px solid var(--border); border-radius:18px; overflow:hidden; box-shadow:var(--shadow);
-  display:flex; flex-direction:column; min-height:280px;
-}
-.thumb{ position:relative; aspect-ratio:16/10; background:var(--brand-2); }
-.thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
-.cat-chip{
-  position:absolute; left:10px; top:10px; background:rgba(255,255,255,0.9); color:#7f2d47; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700; border:1px solid var(--border);
-}
-body.dark .cat-chip{ background:rgba(35,34,42,0.9); color:#ffd7e6; }
-
-.card-body{ padding:12px 14px; display:flex; gap:10px; align-items:flex-start; }
-.avatar{ width:40px; height:40px; border-radius:12px; background:var(--brand-3); display:grid; place-items:center; font-weight:800; color:#7f2d47; border:1px solid var(--border); }
-.info{ flex:1; min-width:0; }
-.name{ margin:0; font-size:16px; font-weight:800; }
-.by{ margin:2px 0 0; color:var(--muted); font-size:12px; }
-
-.heart{ appearance:none; background:transparent; border:0; cursor:pointer; font-size:20px; line-height:1; }
-.heart.fav{ color:var(--danger); }
-
-.open-btn{ margin:8px 14px 14px; padding:10px 12px; border-radius:12px; background:var(--brand); color:#fff; border:0; cursor:pointer; font-weight:700; }
-
-/* Drawer Menu */
-.drawer{
-  position:fixed; inset:0; pointer-events:none; z-index:2000;
-}
-.drawer.show{ pointer-events:auto; }
-.drawer .overlay{ position:absolute; inset:0; background:rgba(0,0,0,0.35); opacity:0; transition:opacity .2s; }
-.drawer.show .overlay{ opacity:1; }
-.panel{
-  position:absolute; left:-320px; top:0; width:320px; height:100%; background:var(--surface); border-right:1px solid var(--border); box-shadow:var(--shadow);
-  transition:transform .25s ease; transform:translateX(0);
-}
-.drawer.show .panel{ transform:translateX(320px); }
-.panel header{ display:flex; align-items:center; gap:10px; padding:14px; border-bottom:1px solid var(--border); }
-.panel h3{ margin:0; font-size:18px; font-weight:800; }
-.close-drawer{ margin-left:auto; appearance:none; border:0; background:var(--brand-3); padding:8px 10px; border-radius:10px; cursor:pointer; }
-
-.panel .section{ padding:14px; border-bottom:1px solid var(--border); }
-.panel label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
-.panel input[type="text"], .panel input[type="search"]{
-  width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text);
-}
-.panel .row{ display:flex; gap:10px; align-items:center; }
-.panel .btn{ width:100%; appearance:none; border:0; padding:10px 12px; border-radius:12px; background:var(--brand); color:#fff; cursor:pointer; font-weight:800; box-shadow:var(--shadow); }
-.panel .btn-secondary{ background:var(--brand-3); color:#7f2d47; border:1px solid var(--border); box-shadow:none; }
-body.dark .panel .btn-secondary{ color:#ffd7e6; }
-
-/* Modal */
-.modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:3000; }
-.modal.show{ display:flex; }
-.modal .backdrop{ position:absolute; inset:0; background:rgba(0,0,0,0.45); }
-.modal .dialog{ position:relative; width:min(880px, 92vw); max-height:90vh; overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:18px; box-shadow:var(--shadow); }
-.modal header{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border); }
-.modal header h3{ margin:0; font-size:18px; font-weight:800; }
-.modal .content{ padding:16px; display:grid; gap:12px; grid-template-columns: 1fr; }
-@media(min-width:880px){ .modal .content{ grid-template-columns: 1fr 1fr; } }
-.modal .content img{ width:100%; border-radius:12px; border:1px solid var(--border); }
-.meta{ color:var(--muted); font-size:13px; }
-.list{ padding-left:18px; }
-
-/* Add Recipe Form */
-.form-grid{ display:grid; gap:12px; grid-template-columns: 1fr; }
-@media(min-width:720px){ .form-grid{ grid-template-columns: 1fr 1fr; } }
-.field{ display:flex; flex-direction:column; gap:6px; }
-.field input, .field select, .field textarea{
-  padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text);
-}
-.field textarea{ min-height:110px; resize:vertical; }
-.actions{ display:flex; gap:10px; justify-content:flex-end; padding-top:8px; }
-.btn{ appearance:none; border:0; background:var(--brand); color:#fff; padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:800; box-shadow:var(--shadow); }
-.btn.secondary{ background:var(--brand-3); color:#7f2d47; border:1px solid var(--border); box-shadow:none; }
-body.dark .btn.secondary{ color:#ffd7e6; }
-
-.empty{ text-align:center; color:var(--muted); padding:30px 10px; }
-
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+    /* Simple focus ring for accessibility */
+    :focus-visible {
+      outline: 2px solid #fbbf24;
+      outline-offset: 2px;
+    }
   </style>
-</head>
-<body>
-  <!-- Drawer เมนูซ้ายบน -->
-  <div class="drawer" id="drawer">
-    <div class="overlay" data-close-drawer></div>
-    <aside class="panel">
-      <header>
-        <h3>เมนู</h3>
-        <button class="close-drawer" data-close-drawer>ปิด</button>
-      </header><div class="section">
-    <label>ชื่อผู้ใช้ (ใช้แสดงในสูตรที่โพสต์)</label>
-    <div class="row">
-      <input type="text" id="usernameInput" placeholder="พิมพ์ชื่อของคุณ">
-    </div>
-  </div>
-
-  <div class="section">
-    <label>ค้นหาสูตร</label>
-    <input type="search" id="searchInput" placeholder="ค้นหาตามชื่อสูตร / ผู้โพสต์">
-  </div>
-
-  <div class="section" style="display:grid; gap:10px;">
-    <button class="btn" id="openAdd">+ เพิ่มสูตรใหม่</button>
-    <button class="btn btn-secondary" id="showFavs">ดูสูตรที่กดหัวใจไว้</button>
-    <button class="btn btn-secondary" id="showAll">แสดงสูตรทั้งหมด</button>
-  </div>
-</aside>
-
-  </div>  <!-- Header -->  <header>
-    <div class="bar">
-      <button class="menu-btn" id="openDrawer" title="เมนู">
-        <span class="icon" aria-hidden="true"></span>
-      </button>
-      <div class="title">แชร์สูตรไอศกรีม</div>
-      <div class="spacer"></div>
-      <button class="theme-toggle" id="themeToggle">ปุ่มสว่าง/ปุ่มมืด</button>
-    </div><!-- Category Tabs -->
-<nav class="tabs" id="tabs">
-  <button class="tab active" data-cat="all">สูตรทั้งหมด</button>
-  <button class="tab" data-cat="ไอศกรีม">ไอศกรีม</button>
-  <button class="tab" data-cat="เค้ก">เค้ก</button>
-  <button class="tab" data-cat="คุกกี้">คุกกี้</button>
-  <button class="tab" data-cat="น้ำปั่น">น้ำปั่น</button>
-</nav>
-
-  </header>  <!-- Main -->  <main class="container">
-    <div id="grid" class="grid" aria-live="polite"></div>
-    <div id="empty" class="empty" style="display:none;">ไม่พบสูตรตามเงื่อนไขที่เลือก</div>
-  </main>  <!-- Modal: ดูรายละเอียดสูตร -->  <div class="modal" id="viewModal" aria-hidden="true">
-    <div class="backdrop" data-close-modal></div>
-    <div class="dialog">
-      <header>
-        <h3 id="viewTitle">รายละเอียดสูตร</h3>
-        <button class="close-drawer" data-close-modal>ปิด</button>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="w-full h-full m-0 antialiased">
+  <div id="app-root" class="w-full h-full bg-[#0f172a] flex justify-center">
+   <div id="app-shell" class="w-full max-w-md h-full flex flex-col bg-[#0b1220] text-white"><!-- HEADER -->
+    <header class="flex items-center justify-between px-4 py-3 bg-[#0ea5e9] text-white shadow-md">
+     <div class="flex items-center gap-2"><!-- Simple store icon -->
+      <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center" aria-hidden="true">
+       <svg class="w-5 h-5 text-white" viewbox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 10L5 5H19L20 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> <path d="M4 10H20V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V10Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> <path d="M9 14H15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+       </svg>
+      </div>
+      <div class="flex flex-col">
+       <h1 id="shop-title" class="text-sm font-semibold leading-tight">ร้านค้าออนไลน์</h1>
+       <p id="shop-tagline" class="text-[11px] text-white/80 leading-tight">เลือกสินค้า ใส่ตะกร้า และชำระเงินในหน้าเดียว</p>
+      </div>
+     </div>
+     <div class="flex items-center gap-2"><button id="home-icon-btn" type="button" class="flex flex-col items-center gap-0.5 text-xs font-semibold" aria-label="หน้าหลัก">
+       <svg class="w-5 h-5" viewbox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+       </svg><span class="text-[10px]">HOME</span> </button> <button id="cart-icon-btn" type="button" class="relative flex flex-col items-center gap-0.5 text-xs font-semibold" aria-label="ดูตะกร้าสินค้า">
+       <svg class="w-5 h-5" viewbox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4H6L7.5 15H18L20 8H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> <circle cx="10" cy="19" r="1" fill="currentColor" /> <circle cx="17" cy="19" r="1" fill="currentColor" />
+       </svg><span class="text-[10px]">ตะกร้��</span> <span id="cart-count-badge" class="absolute -top-1 -right-1 inline-flex min-w-[16px] h-[16px] items-center justify-center rounded-full bg-[#f97316] px-1 text-[10px] font-bold" aria-label="จำนวนสินค้าในตะกร้า"> 0 </span> </button> <button id="profile-icon-btn" type="button" class="flex flex-col items-center gap-0.5 text-xs font-semibold" aria-label="โปรไฟล์">
+       <svg class="w-5 h-5" viewbox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+       </svg><span class="text-[10px]">โปรไฟล์</span> </button>
+     </div>
+    </header><!-- MAIN CONTENT -->
+    <main id="main-content" class="flex-1 overflow-y-auto px-3 pt-3 pb-20" role="main"><!-- SECTION: PRODUCT LIST -->
+     <section id="section-home" class="space-y-3" aria-label="รายการสินค้า">
+      <header class="px-1">
+       <h2 id="home-heading" class="text-base font-semibold text-[#7dd3fc] mb-0.5">สินค้าแ���ะนำ</h2>
+       <p class="text-xs text-slate-300">แตะที่สินค้าเพื่อดูรายละเอียด หรือเพิ่มลงตะกร้าได้ทันที</p>
       </header>
-      <div class="content">
-        <div>
-          <img id="viewImage" alt="รูปสูตร">
-          <div class="meta" id="viewMeta"></div>
-          <div id="viewVideoWrap"></div>
-        </div>
-        <div>
-          <h4>ส่วนผสม</h4>
-          <ul class="list" id="viewIngredients"></ul>
-          <h4>วิธีทำ</h4>
-          <ol class="list" id="viewSteps"></ol>
-        </div>
+      <div id="product-grid" class="grid grid-cols-2 gap-3"><!-- Product cards will be injected here -->
       </div>
-    </div>
-  </div>  <!-- Modal: เพิ่ม/แก้ไขสูตร -->  <div class="modal" id="addModal" aria-hidden="true">
-    <div class="backdrop" data-close-add></div>
-    <div class="dialog">
-      <header>
-        <h3>เพิ่มสูตรใหม่</h3>
-        <button class="close-drawer" data-close-add>ปิด</button>
+     </section><!-- SECTION: PRODUCT DETAIL -->
+     <section id="section-detail" class="hidden space-y-4" aria-label="รายละเอียดสินค้า"><button id="back-to-home-from-detail" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>กลับไปหน้าสินค้า</span> </button>
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/40 shadow-lg overflow-hidden">
+       <div id="detail-visual" class="h-40 flex items-center justify-center bg-gradient-to-br from-sky-500/40 via-sky-700/40 to-sky-900/60" aria-hidden="true"><span id="detail-emoji" class="text-5xl"> ⭐ </span>
+       </div>
+       <div class="p-4 space-y-2">
+        <div class="flex items-start justify-between gap-3">
+         <div>
+          <h2 id="detail-name" class="text-base font-semibold text-white">ชื่อสินค้า</h2>
+          <p id="detail-short" class="text-xs text-slate-300 mt-1">คำอธิบายสั้น ๆ ของสินค้า</p>
+         </div>
+         <p id="detail-price" class="text-sm font-bold text-sky-300">฿0</p>
+        </div>
+        <p id="detail-long" class="mt-1 text-xs text-slate-300">รายละเอียดสินค้าแบบเต็มจะแสดงที่นี่</p>
+        <div class="mt-3 flex items-center justify-between gap-3">
+         <div class="text-xs text-slate-400"><span>สถานะ: </span> <span class="font-semibold text-emerald-300">พร้อมส่ง</span>
+         </div><button id="detail-add-to-cart" type="button" class="inline-flex flex-1 justify-center items-center gap-1 rounded-xl bg-[#0ea5e9] px-3 py-2 text-xs font-semibold text-white hover:bg-[#0284c7] transition-colors"> + ใส่ในตะกร้า </button>
+        </div>
+       </div>
+      </article>
+     </section><!-- SECTION: CART -->
+     <section id="section-cart" class="hidden space-y-4" aria-label="ตะกร้าสินค้า">
+      <div class="flex items-center justify-between"><button id="back-to-home-from-cart" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>เลือกสินค้าต่อ</span> </button>
+       <p class="text-xs text-slate-300">ในตะกร้า: <span id="cart-item-count-text">0 รายการ</span></p>
+      </div>
+      <div id="cart-empty-state" class="rounded-2xl border border-dashed border-sky-800 bg-slate-900/40 px-4 py-6 text-center text-xs text-slate-300">
+       <p>ยังไม่มีสินค้าในตะกร้า</p>
+       <p class="mt-1 text-[11px] text-slate-400">เลือกสินค้าจากหน้าหลักแล้วกด "เพิ่มในต���กร้า"</p>
+      </div>
+      <div id="cart-list" class="space-y-3"><!-- Cart items will be injected here -->
+      </div>
+      <div id="cart-actions" class="hidden space-y-3">
+       <div class="rounded-2xl bg-[#020617] border border-sky-900/70 px-4 py-3">
+        <div class="flex items-center justify-between text-sm"><span class="text-slate-300">ยอดรวมทั้งหมด</span> <span id="cart-total-price" class="text-lg font-bold text-sky-300">฿0</span>
+        </div>
+       </div><button id="proceed-to-checkout-btn" type="button" class="w-full rounded-xl bg-[#0ea5e9] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0284c7]"> ดำเนินการชำระเงิน </button>
+      </div>
+     </section><!-- SECTION: LOGIN -->
+     <section id="section-login" class="hidden space-y-4" aria-label="เข้าสู่ระบบ">
+      <header class="space-y-1 text-center">
+       <h2 class="text-lg font-semibold text-[#7dd3fc]">เข้าสู่ระบบ</h2>
+       <p class="text-xs text-slate-300">ยินดีต้อนรับกลับมา! กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
       </header>
-      <div class="content">
-        <form id="addForm" class="form-grid">
-          <div class="field">
-            <label>ชื่อสูตร *</label>
-            <input type="text" name="title" required placeholder="เช่น ไอศกรีมวานิลลาโฮมเมด">
-          </div>
-          <div class="field">
-            <label>หมวดหมู่ *</label>
-            <select name="category" required>
-              <option value="ไอศกรีม">ไอศกรีม</option>
-              <option value="เค้ก">เค้ก</option>
-              <option value="คุกกี้">คุกกี้</option>
-              <option value="น้ำปั่น">น้ำปั่น</option>
-            </select>
-          </div><div class="field" style="grid-column:1/-1;">
-        <label>ส่วนผสม (พิมพ์บรรทัดละ 1 รายการ) *</label>
-        <textarea name="ingredients" required placeholder="นมสด 500 มล.\nวิปปิ้งครีม 200 มล.\nน้ำตาล 80 กรัม"></textarea>
-      </div> 
-
-            <div class="field" style="grid-column:1/-1;">
-        <label>วิธีทำ (พิมพ์บรรทัดละ 1 ขั้นตอน) *</label>
-        <textarea name="steps" required placeholder="ผสมส่วนผสมทั้งหมด\nแช่ช่องฟรีซ 4-6 ชม.\nคนทุก 30 นาที 2-3 ครั้ง"></textarea>
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-4 space-y-4">
+       <form id="login-form" class="space-y-3">
+        <div><label for="login_email" class="block text-xs text-slate-300 mb-1"> อีเมล </label> <input id="login_email" name="login_email" type="email" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="example@email.com" required>
+        </div>
+        <div><label for="login_password" class="block text-xs text-slate-300 mb-1"> รหัสผ่าน </label> <input id="login_password" name="login_password" type="password" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="••••••••" required>
+        </div><button type="submit" class="w-full rounded-xl bg-[#0ea5e9] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0284c7]"> เข้าสู่ระบบ </button>
+       </form>
+       <div class="text-center space-y-2">
+        <p class="text-xs text-slate-400">ยังไม่มีบัญชี? <button id="go-to-register" type="button" class="text-sky-300 hover:text-sky-200 font-semibold"> สมัครสมาชิก </button></p>
+        <p class="text-xs text-slate-400">หรือ <button id="go-to-seller-register" type="button" class="text-emerald-300 hover:text-emerald-200 font-semibold"> สมัครเป็นผู้ขาย </button></p>
+       </div>
+       <div class="mt-4 pt-3 border-t border-sky-900/40">
+        <p class="text-center text-[11px] text-slate-400 mb-2">สำหรับผู้ดูแลระบบ</p>
+        <div class="rounded-xl border border-amber-900/60 bg-amber-950/30 px-3 py-2">
+         <p class="text-[11px] text-amber-200"><span class="font-semibold">🔐 เข้าสู่ระบบแอดมิน:</span></p>
+         <p class="text-[11px] text-amber-300 mt-1">อีเมล: admin@shop.com<br>
+           รหัสผ่าน: admin123</p>
+        </div>
+       </div>
+      </article>
+     </section><!-- SECTION: REGISTER -->
+     <section id="section-register" class="hidden space-y-4" aria-label="สมัครสมาชิก">
+      <header class="space-y-1 text-center">
+       <h2 class="text-lg font-semibold text-[#7dd3fc]">สมัครสมาชิก</h2>
+       <p class="text-xs text-slate-300">สร้างบัญชีใหม่เพื่อเริ่มต้นใช้งาน</p>
+      </header>
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-4 space-y-4">
+       <form id="register-form" class="space-y-3">
+        <div><label for="register_name" class="block text-xs text-slate-300 mb-1"> ชื่อ-นามสกุล </label> <input id="register_name" name="register_name" type="text" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="เช่น สมชาย ใจดี" required>
+        </div>
+        <div><label for="register_email" class="block text-xs text-slate-300 mb-1"> อีเมล </label> <input id="register_email" name="register_email" type="email" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="example@email.com" required>
+        </div>
+        <div><label for="register_phone" class="block text-xs text-slate-300 mb-1"> เบอร์โทร </label> <input id="register_phone" name="register_phone" type="tel" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="08x-xxx-xxxx" required>
+        </div>
+        <div><label for="register_password" class="block text-xs text-slate-300 mb-1"> รหัสผ่าน </label> <input id="register_password" name="register_password" type="password" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="••••••••" required>
+        </div>
+        <div><label for="register_confirm_password" class="block text-xs text-slate-300 mb-1"> ยืนยันรหัสผ่าน </label> <input id="register_confirm_password" name="register_confirm_password" type="password" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="••••••••" required>
+        </div><button type="submit" class="w-full rounded-xl bg-[#0ea5e9] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0284c7]"> สมัครสมาชิก </button>
+       </form>
+       <div class="text-center">
+        <p class="text-xs text-slate-400">มีบัญชีอยู่แล้ว? <button id="go-to-login" type="button" class="text-sky-300 hover:text-sky-200 font-semibold"> เข้าสู่ระบบ </button></p>
+       </div>
+      </article>
+     </section><!-- SECTION: SELLER REGISTER -->
+     <section id="section-seller-register" class="hidden space-y-4" aria-label="สมัครเป็นผู้ข���ย"><button id="back-to-login-from-seller" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>กลับไปหน้าเข้าสู่ระบบ</span> </button>
+      <header class="space-y-1 text-center">
+       <h2 class="text-lg font-semibold text-[#7dd3fc]">สมัครเป็นผู้ขาย</h2>
+       <p class="text-xs text-slate-300">เปิดร้านค้าออนไลน์ของคุณเอง</p>
+      </header>
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-4 space-y-4">
+       <form id="seller-register-form" class="space-y-3">
+        <div><label for="seller_shop_name" class="block text-xs text-slate-300 mb-1"> ชื่อร้านค้า </label> <input id="seller_shop_name" name="seller_shop_name" type="text" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="เช่น ร้านของดีมีคุณภาพ" required>
+        </div>
+        <div><label for="seller_name" class="block text-xs text-slate-300 mb-1"> ชื่อ-นามสกุล (เจ้าของร้าน) </label> <input id="seller_name" name="seller_name" type="text" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="เช่น สมชาย ใจดี" required>
+        </div>
+        <div><label for="seller_email" class="block text-xs text-slate-300 mb-1"> อีเมล </label> <input id="seller_email" name="seller_email" type="email" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="example@email.com" required>
+        </div>
+        <div><label for="seller_phone" class="block text-xs text-slate-300 mb-1"> ���บอร์โทรศัพท์ </label> <input id="seller_phone" name="seller_phone" type="tel" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="08x-xxx-xxxx" required>
+        </div>
+        <div><label for="seller_address" class="block text-xs text-slate-300 mb-1"> ที่อยู่ร้านค้า </label> <textarea id="seller_address" name="seller_address" rows="3" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="ระบุที่อยู่ร้านค้าอย่างละเอียด" required></textarea>
+        </div>
+        <div><label for="seller_tax_id" class="block text-xs text-slate-300 mb-1"> เลขประจำตัวผู้เสียภาษี (ถ้ามี) </label> <input id="seller_tax_id" name="seller_tax_id" type="text" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="13 หลัก (ไม่บังคับ)">
+        </div>
+        <div><label for="seller_password" class="block text-xs text-slate-300 mb-1"> รหัสผ่าน </label> <input id="seller_password" name="seller_password" type="password" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="••••••••" required>
+        </div>
+        <div><label for="seller_confirm_password" class="block text-xs text-slate-300 mb-1"> ยืนยันรหัสผ่าน </label> <input id="seller_confirm_password" name="seller_confirm_password" type="password" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="••••••••" required>
+        </div>
+        <div class="rounded-xl border border-emerald-900/60 bg-emerald-950/30 px-3 py-2">
+         <p class="text-[11px] text-emerald-200"><span class="font-semibold">💡 สิทธิประโยชน์ผู้ขาย:</span></p>
+         <ul class="mt-1 text-[11px] text-emerald-300 space-y-0.5 list-disc list-inside">
+          <li>เปิดร้านค้าออนไลน์ฟรี</li>
+          <li>จัดการสินค้าและคำสั่งซื้อ</li>
+          <li>ระบบรายงานยอดขาย</li>
+          <li>รับเงินตรงเข้าบัญชี</li>
+         </ul>
+        </div><button type="submit" class="w-full rounded-xl bg-[#0ea5e9] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0284c7]"> สมัครเป็นผู้ขาย </button>
+       </form>
+       <div class="text-center">
+        <p class="text-xs text-slate-400">มีบัญชีอยู่แล้ว? <button id="go-to-login-from-seller" type="button" class="text-sky-300 hover:text-sky-200 font-semibold"> เข้าสู่ระบบ </button></p>
+       </div>
+      </article>
+     </section><!-- SECTION: PROFILE (LOGGED IN) -->
+     <section id="section-profile" class="hidden space-y-4" aria-label="โปรไฟล์">
+      <header class="space-y-1">
+       <h2 class="text-base font-semibold text-[#7dd3fc]">โปรไฟล์ของฉัน</h2>
+       <p class="text-xs text-slate-300">ข้อมูลส่วนตัวและการตั้งค่าบัญชี</p>
+      </header><!-- Profile Card -->
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-4 space-y-4">
+       <div class="flex items-center gap-3">
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-sky-500/40 via-sky-700/40 to-sky-900/60 flex items-center justify-center"><span class="text-3xl">👤</span>
+        </div>
+        <div class="flex-1">
+         <h3 id="profile-name" class="text-sm font-semibold text-white">ผู้ใช้งาน</h3>
+         <p id="profile-email" class="text-xs text-slate-300 mt-0.5">user@example.com</p>
+        </div>
+       </div>
+       <div class="space-y-2">
+        <div class="flex items-center justify-between py-2 border-b border-sky-900/40"><span class="text-xs text-slate-300">ชื่อ-นามสกุล</span> <span id="profile-fullname" class="text-xs text-white font-medium">ยังไม่ได้ระบุ</span>
+        </div>
+        <div class="flex items-center justify-between py-2 border-b border-sky-900/40"><span class="text-xs text-slate-300">เบอร์โทร</span> <span id="profile-phone" class="text-xs text-white font-medium">ยังไม่ได้ระบุ</span>
+        </div>
+       </div><button id="edit-profile-btn" type="button" class="w-full rounded-xl bg-[#0ea5e9] px-4 py-2 text-xs font-semibold text-white hover:bg-[#0284c7]"> แก้ไขข้อมูล </button>
+      </article><!-- Saved Addresses -->
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3 space-y-3">
+       <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold text-sky-200">ที่อยู่ที่บันทึกไว้</h3><button id="add-address-btn" type="button" class="text-xs text-sky-300 hover:text-sky-200 font-semibold"> + เพิ่มที่อยู่ </button>
+       </div>
+       <div id="saved-addresses-list" class="space-y-2">
+        <div class="text-center py-4">
+         <p class="text-xs text-slate-300">ยังไม่มีที่อยู่ที่บันทึกไว้</p>
+         <p class="text-[11px] text-slate-400 mt-1">เพิ่มที่อยู่��พื่อความสะดวกในการสั่งซื้อ</p>
+        </div>
+       </div>
+      </article><!-- Order History -->
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3 space-y-3">
+       <h3 class="text-xs font-semibold text-sky-200">ประวัติการสั่งซื้อ</h3>
+       <div class="text-center py-4">
+        <p class="text-xs text-slate-300">ยังไม่มีประวัติการสั่งซื้อ</p>
+        <p class="text-[11px] text-slate-400 mt-1">เมื่อคุณสั่งซื้อสินค้า ประวัติจะแสดงที่นี่</p>
+       </div>
+      </article><!-- Settings -->
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3 space-y-3">
+       <h3 class="text-xs font-semibold text-sky-200">การตั้งค่า</h3>
+       <div class="space-y-2"><button type="button" class="w-full flex items-center justify-between py-2 text-xs text-slate-200 hover:text-white"> <span>การแจ้งเตือน</span> <span>›</span> </button> <button type="button" class="w-full flex items-center justify-between py-2 text-xs text-slate-200 hover:text-white"> <span>ความเป็นส่วนตัว</span> <span>›</span> </button> <button type="button" class="w-full flex items-center justify-between py-2 text-xs text-slate-200 hover:text-white"> <span>ช่วยเหลือและสนับสนุน</span> <span>›</span> </button> <button id="logout-btn" type="button" class="w-full flex items-center justify-between py-2 text-xs text-rose-300 hover:text-rose-200"> <span>ออกจากระบบ</span> <span>›</span> </button>
+       </div>
+      </article>
+     </section><!-- SECTION: ADD/EDIT ADDRESS -->
+     <section id="section-address-form" class="hidden space-y-4" aria-label="เพิ่มที่อยู่"><button id="back-to-profile-from-address" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>กลับไปโปรไฟล์</span> </button>
+      <header class="space-y-1">
+       <h2 id="address-form-title" class="text-base font-semibold text-[#7dd3fc]">เพิ่มที่อยู่ใหม่</h2>
+       <p class="text-xs text-slate-300">กรอกข้อมูลที่อยู่เพื่อความสะดวกในการสั่งซื้อ</p>
+      </header>
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-4 space-y-4">
+       <form id="address-form" class="space-y-3">
+        <div><label for="address_label" class="block text-xs text-slate-300 mb-1"> ชื่อที่อยู่ (เช่น บ้าน, ที่ทำงาน) </label> <input id="address_label" name="address_label" type="text" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="เช่น บ้าน" required>
+        </div>
+        <div><label for="address_name" class="block text-xs text-slate-300 mb-1"> ชื่อผู้รับ </label> <input id="address_name" name="address_name" type="text" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="เช่�� สมชาย ใจดี" required>
+        </div>
+        <div><label for="address_phone" class="block text-xs text-slate-300 mb-1"> เบอร์โทร </label> <input id="address_phone" name="address_phone" type="tel" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="08x-xxx-xxxx" required>
+        </div>
+        <div><label for="address_detail" class="block text-xs text-slate-300 mb-1"> ที่อยู่ (บ้านเลขที่, ถนน, เขต/อำเภอ, จังหวั��, รหัสไปรษณีย์) </label> <textarea id="address_detail" name="address_detail" rows="4" class="w-full rounded-xl border border-sky-900/70 bg-slate-900/60 px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:border-sky-400 focus:ring-0" placeholder="ระบุที่อยู่อย่างละเอียด" required></textarea>
+        </div>
+        <div class="flex gap-2"><button id="cancel-address-btn" type="button" class="flex-1 rounded-xl border border-sky-800 bg-slate-900/60 px-4 py-2.5 text-sm font-semibold text-sky-200 hover:bg-slate-900"> ยกเลิก </button> <button type="submit" class="flex-1 rounded-xl bg-[#0ea5e9] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0284c7]"> บันทึกที่อยู่ </button>
+        </div>
+       </form>
+      </article>
+     </section><!-- SECTION: ADMIN DASHBOARD -->
+     <section id="section-admin" class="hidden space-y-4" aria-label="แดชบอร์ดแอดมิน">
+      <header class="space-y-1">
+       <h2 class="text-base font-semibold text-[#7dd3fc]">แดชบอร์ดแอดมิน</h2>
+       <p class="text-xs text-slate-300">จัดการสินค้า คำสั่งซื้อ และผู้ใช้งาน</p>
+      </header><!-- Stats Cards -->
+      <div class="grid grid-cols-2 gap-3">
+       <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3">
+        <div class="flex items-center gap-2"><span class="text-2xl">📦</span>
+         <div>
+          <p class="text-xs text-slate-300">สินค้าทั้งหมด</p>
+          <p id="admin-total-products" class="text-lg font-bold text-sky-300">30</p>
+         </div>
+        </div>
+       </article>
+       <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3">
+        <div class="flex items-center gap-2"><span class="text-2xl">🛒</span>
+         <div>
+          <p class="text-xs text-slate-300">คำสั่งซื้อ</p>
+          <p id="admin-total-orders" class="text-lg font-bold text-emerald-300">0</p>
+         </div>
+        </div>
+       </article>
+       <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3">
+        <div class="flex items-center gap-2"><span class="text-2xl">👥</span>
+         <div>
+          <p class="text-xs text-slate-300">ผู้ใช้งาน</p>
+          <p id="admin-total-users" class="text-lg font-bold text-purple-300">0</p>
+         </div>
+        </div>
+       </article>
+       <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3">
+        <div class="flex items-center gap-2"><span class="text-2xl">💰</span>
+         <div>
+          <p class="text-xs text-slate-300">ยอดขาย</p>
+          <p id="admin-total-revenue" class="text-lg font-bold text-amber-300">฿0</p>
+         </div>
+        </div>
+       </article>
+      </div><!-- Quick Actions -->
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3 space-y-3">
+       <h3 class="text-xs font-semibold text-sky-200">การจัดการ</h3>
+       <div class="space-y-2"><button id="admin-manage-products-btn" type="button" class="w-full flex items-center justify-between py-2 text-xs text-slate-200 hover:text-white"> <span>📦 จัดการสินค้า</span> <span>›</span> </button> <button id="admin-manage-orders-btn" type="button" class="w-full flex items-center justify-between py-2 text-xs text-slate-200 hover:text-white"> <span>🛒 จัดการคำสั่งซื้อ</span> <span>›</span> </button> <button id="admin-manage-users-btn" type="button" class="w-full flex items-center justify-between py-2 text-xs text-slate-200 hover:text-white"> <span>👥 จัดการผู้ใช้งาน</span> <span>›</span> </button> <button id="admin-settings-btn" type="button" class="w-full flex items-center justify-between py-2 text-xs text-slate-200 hover:text-white"> <span>⚙️ ตั้งค่าระบบ</span> <span>›</span> </button>
+       </div>
+      </article><!-- Recent Activity -->
+      <article class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3 space-y-3">
+       <h3 class="text-xs font-semibold text-sky-200">กิจกรรมล่าสุด</h3>
+       <div id="admin-recent-activity" class="space-y-2">
+        <div class="text-center py-4">
+         <p class="text-xs text-slate-300">ยังไม่มีกิจกรรม</p>
+        </div>
+       </div>
+      </article><button id="admin-logout-btn" type="button" class="w-full rounded-xl border border-rose-800 bg-rose-900/20 px-4 py-2.5 text-sm font-semibold text-rose-300 hover:bg-rose-900/40"> ออกจากระบบแอดมิน </button>
+     </section><!-- SECTION: ADMIN MANAGE PRODUCTS -->
+     <section id="section-admin-products" class="hidden space-y-4" aria-label="จัดการสินค้า"><button id="back-to-admin-from-products" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>กลับไปแดชบอร์ด</span> </button>
+      <header class="flex items-center justify-between">
+       <div>
+        <h2 class="text-base font-semibold text-[#7dd3fc]">จัดการสินค้า</h2>
+        <p class="text-xs text-slate-300">แก้ไข เพิ่ม หรือลบสินค้า</p>
+       </div><button id="admin-add-product-btn" type="button" class="rounded-xl bg-[#0ea5e9] px-3 py-2 text-xs font-semibold text-white hover:bg-[#0284c7]"> + เพิ่มสินค้า </button>
+      </header>
+      <div id="admin-products-list" class="space-y-3"><!-- Products will be rendered here -->
       </div>
-
-      <div class="field">
-        <label>วิดีโอสาธารณะ (ลิงก์ YouTube หรือ mp4)</label>
-        <input type="text" name="videoUrl" placeholder="https://..."></input>
+     </section><!-- SECTION: ADMIN MANAGE ORDERS -->
+     <section id="section-admin-orders" class="hidden space-y-4" aria-label="จัดการคำสั่งซื้อ"><button id="back-to-admin-from-orders" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>กลับไปแดชบอร์ด</span> </button>
+      <header>
+       <h2 class="text-base font-semibold text-[#7dd3fc]">จัดการคำสั่งซื้อ</h2>
+       <p class="text-xs text-slate-300">ดูและจัดการคำสั่งซื้อทั้งหมด</p>
+      </header>
+      <div id="admin-orders-list" class="space-y-3">
+       <div class="text-center py-8 rounded-2xl bg-[#020617] border border-sky-900/60">
+        <p class="text-xs text-slate-300">ยังไม่มีคำสั่งซื้อ</p>
+        <p class="text-[11px] text-slate-400 mt-1">คำสั่งซื้อจะแสดงที่นี่เมื่อมีลูกค้าสั่งซื้อสินค้า</p>
+       </div>
       </div>
-      <div class="field">
-        <label>อัปโหลดไฟล์วิดีโอ (ไม่บันทึกถาวร)</label>
-        <input type="file" name="videoFile" accept="video/*">
+     </section><!-- SECTION: ADMIN MANAGE USERS -->
+     <section id="section-admin-users" class="hidden space-y-4" aria-label="จัดการผู้ใช้งาน"><button id="back-to-admin-from-users" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>กลับไปแดชบอร์ด</span> </button>
+      <header>
+       <h2 class="text-base font-semibold text-[#7dd3fc]">จัดการผู้ใช้งาน</h2>
+       <p class="text-xs text-slate-300">ดูและจัดการผู้ใช้งานทั้งหมด</p>
+      </header>
+      <div id="admin-users-list" class="space-y-3">
+       <div class="text-center py-8 rounded-2xl bg-[#020617] border border-sky-900/60">
+        <p class="text-xs text-slate-300">ยังไม่มีผู้ใช้งาน</p>
+        <p class="text-[11px] text-slate-400 mt-1">ผู้ใช้งานที่สมัครจะแสดงที่นี่</p>
+       </div>
       </div>
-
-      <div class="field">
-        <label>ชื่อผู้โพสต์ *</label>
-        <input type="text" name="author" id="authorField" required placeholder="ชื่อคุณ">
-      </div>
-      <div class="field">
-        <label>อัปโหลดรูปภาพ *</label>
-        <input type="file" name="image" accept="image/*" required>
-      </div>
-
-      <div class="actions" style="grid-column:1/-1;">
-        <button type="button" class="btn secondary" data-close-add>ยกเลิก</button>
-        <button type="submit" class="btn">บันทึกสูตร</button>
-      </div>
-    </form>
-    <div class="meta" style="grid-column:1/-1;">
-      หมายเหตุ: ไฟล์วิดีโอที่อัปโหลดจะเล่นได้เฉพาะในรอบการใช้งานปัจจุบัน และจะไม่ถูกเก็บใน LocalStorage (เพื่อประสิทธิภาพ)
+     </section><!-- SECTION: CHECKOUT -->
+     <section id="section-checkout" class="hidden space-y-4" aria-label="เช็คเอาต์"><button id="back-to-cart-from-checkout" type="button" class="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200"> <span class="inline-block rotate-180">➜</span> <span>กลับไปตะกร้า</span> </button>
+      <header class="space-y-1">
+       <h2 id="checkout-heading" class="text-base font-semibold text-[#7dd3fc]">เช็คเอาต์ &amp; ชำระเงิน (ตัวอย่าง)</h2>
+       <p id="checkout-subheading" class="text-xs text-slate-300">เลือกที่อยู่จัดส่งและยืนยันคำสั่งซื้อ (ไม่มีการชำระเงินจริง)</p>
+      </header><!-- Select Address -->
+      <section class="rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3 space-y-3">
+       <div class="flex items-center justify-between">
+        <h3 class="text-xs font-semibold text-sky-200">เลือกที่อยู่จัดส่ง</h3><button id="add-address-from-checkout-btn" type="button" class="text-xs text-sky-300 hover:text-sky-200 font-semibold"> + เพิ่มที่อยู�� </button>
+       </div>
+       <div id="checkout-address-list" class="space-y-2">
+        <div class="text-center py-4">
+         <p class="text-xs text-slate-300">ยังไม่มีที่อยู่ที่บันทึกไว้</p>
+         <p class="text-[11px] text-slate-400 mt-1">กรุณาเพิ่มที่อยู่เพื่อดำเนินการต่อ</p>
+        </div>
+       </div>
+      </section><!-- Order summary -->
+      <section class="rounded-2xl bg-[#020617] border border-sky-900/70 px-4 py-3 space-y-3">
+       <h3 id="order-summary-label" class="text-xs font-semibold text-sky-200">สรุปคำสั่งซื้อ</h3>
+       <div id="checkout-summary-items" class="space-y-2 text-xs text-slate-200"><!-- summary lines -->
+       </div>
+       <div class="mt-2 flex items-center justify-between text-xs font-semibold"><span class="text-slate-300">ยอดรวมทั้งหมด</span> <span id="checkout-total" class="text-sky-300"> ฿0 </span>
+       </div>
+       <div class="mt-2 rounded-xl border border-dashed border-sky-900 px-3 py-2 text-[11px] text-slate-300">
+        <p class="font-semibold text-sky-200">ชำระเงิน (ตัวอย่าง)</p>
+        <p class="mt-1 text-[11px] text-slate-400">ส่วนนี้เป็นการจำลองขั้นตอนการชำระเงินเท่านั้น ไม่มีการตัดบัตรหรือโอนเงินจริงใด ๆ</p>
+       </div><button id="place-order-btn" type="button" class="w-full rounded-xl bg-[#0ea5e9] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0284c7]"> ยืนยันคำสั่งซื้อ (ตัวอย่าง) </button>
+      </section>
+     </section>
+    </main><!-- FOOTER FIXED NAV BAR -->
+    <footer id="footer-bar" class="fixed left-1/2 bottom-3 -translate-x-1/2 w-full max-w-md px-3">
+     <div class="flex items-center justify-center gap-3 rounded-2xl bg-[#020617]/95 border border-sky-900/70 px-4 py-3 shadow-[0_18px_45px_rgba(0,0,0,0.7)] backdrop-blur"><button id="footer-home-btn" type="button" class="flex-1 flex flex-col items-center gap-1 text-sky-300 hover:text-sky-200">
+       <svg class="w-6 h-6" viewbox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+       </svg><span class="text-xs font-semibold">HOME</span> </button> <button id="footer-profile-btn" type="button" class="flex-1 flex flex-col items-center gap-1 text-sky-300 hover:text-sky-200">
+       <svg class="w-6 h-6" viewbox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /> <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+       </svg><span class="text-xs font-semibold">โปรไฟล์</span> </button>
+     </div>
+    </footer><!-- TOAST / INLINE MESSAGE -->
+    <div id="toast" class="pointer-events-none fixed inset-x-0 bottom-20 flex justify-center px-4 opacity-0 transition-opacity duration-200" aria-live="polite">
+     <div id="toast-inner" class="max-w-xs rounded-xl bg-slate-900/95 px-3 py-2 text-[11px] text-slate-50 shadow-lg border border-sky-700/70"><!-- text set via JS -->
+     </div>
     </div>
+   </div>
   </div>
-</div>
+  <script>
+    // ------- CONFIG & ELEMENT SDK SETUP --------
+    const defaultConfig = {
+      background_color: "#0b1220",
+      surface_color: "#020617",
+      text_color: "#e5e7eb",
+      primary_action_color: "#0ea5e9",
+      secondary_action_color: "#f97316",
+      font_family: "Segoe UI",
+      font_size: 14,
 
-  </div>  <script>
-    // ---------- Utilities ----------
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-
-    const STORAGE_KEY = 'icecream_recipes_v1';
-    const FAV_KEY = 'icecream_favs_v1';
-    const THEME_KEY = 'icecream_theme_v1';
-    const USER_KEY = 'icecream_user_v1';
-
-    const catTH = ['ไอศกรีม','เค้ก','คุกกี้','น้ำปั่น'];
-
-    function uid(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
-
-    function toBase64(file){
-      return new Promise((resolve,reject)=>{
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result);
-        fr.onerror = reject;
-        fr.readAsDataURL(file);
-      });
-    }
-
-    // ---------- video helpers ----------
-    // คืน id หรือข้อมูลสำคัญจาก url/id ทั่วไป (รองรับ YouTube, TikTok)
-    function extractVideoId(urlOrId){
-      if(!urlOrId) return { provider:null, id:null };
-
-      // ถ้าเป็น ID สั้น ๆ (นึกถึง YouTube id) ให้ถือว่าเป็น YouTube id
-      if(/^[A-Za-z0-9_-]{6,}$/.test(urlOrId)) return { provider:'youtube', id: urlOrId };
-
-      try{
-        const u = new URL(urlOrId);
-        const host = u.hostname.toLowerCase();
-
-        // youtu.be/ID
-        if(host.includes('youtu.be')){
-          const parts = u.pathname.split('/').filter(Boolean);
-          if(parts.length) return { provider:'youtube', id: parts.pop(), url: urlOrId };
-        }
-
-        // youtube.com (watch?v=ID, /embed/ID, /shorts/ID)
-        if(host.includes('youtube.com')){
-          const v = u.searchParams.get('v');
-          if(v) return { provider:'youtube', id: v, url: urlOrId };
-          const parts = u.pathname.split('/').filter(Boolean);
-          if(parts.length) return { provider:'youtube', id: parts.pop(), url: urlOrId }; // embed/ID or shorts/ID
-        }
-
-        // tiktok.com (ลิงก์มักเป็น /@user/video/ID)
-        if(host.includes('tiktok.com')){
-          const parts = u.pathname.split('/').filter(Boolean);
-          // หา segment ที่เป็นตัวเลข/ตัวอักษรยาวพอที่จะเป็น id
-          // ตัวอย่าง path: @username/video/7123456789012345678
-          const idx = parts.findIndex(p => p === 'video');
-          if(idx >= 0 && parts[idx+1]) return { provider:'tiktok', id: parts[idx+1], url:urlOrId };
-          // บางรูปแบบอาจเป็น /v/ID
-          const vIdx = parts.findIndex(p => p === 'v');
-          if(vIdx >= 0 && parts[vIdx+1]) return { provider:'tiktok', id: parts[vIdx+1], url:urlOrId };
-          // fallback: คืน provider=tiktok กับ url (ไม่เจอ id ชัดเจน)
-          return { provider:'tiktok', id: null, url: urlOrId };
-        }
-
-      }catch(e){
-        // not a valid URL → fallback regex below
-      }
-
-      // fallback: หา pattern ที่น่าจะเป็น id (ตัวเลขยาว ๆ สำหรับ TikTok หรือชุดตัวอักษร 6+ สำหรับ YouTube)
-      const tkt = String(urlOrId).match(/(\d{9,})/); // TikTok id มักเป็นตัวเลขยาว
-      if(tkt) return { provider:'tiktok', id: tkt[1], url: urlOrId };
-
-      const y = String(urlOrId).match(/([A-Za-z0-9_-]{6,})/);
-      if(y) return { provider:'youtube', id: y[1], url: urlOrId };
-
-      return { provider:null, id:null };
-    }
-
-    // สร้าง embed snippet หรือคืน src ที่เหมาะสม (ใช้ใน openView)
-    function embedFor(videoUrl){
-      if(!videoUrl) return { type:null, src:null, html:null, provider:null };
-
-      const info = extractVideoId(videoUrl);
-
-      // YouTube
-      if(info.provider === 'youtube' && info.id){
-        const embedSrc = `https://www.youtube.com/embed/${info.id}`;
-        const html = `<iframe src="${embedSrc}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%; aspect-ratio:16/9; border:0; border-radius:12px; margin-top:10px;"></iframe>`;
-        return { type:'iframe', src: embedSrc, html, provider:'youtube' };
-      }
-
-      // TikTok: คืน blockquote ให้ tiktok embed.js render ให้
-      if(info.provider === 'tiktok'){
-        const tiktokUrl = info.url || (info.id ? `https://www.tiktok.com/@_/_/video/${info.id}` : videoUrl);
-        const useUrl = /^https?:\/\//i.test(videoUrl) ? videoUrl : tiktokUrl;
-        const html = `<blockquote class="tiktok-embed" cite="${useUrl}" data-video="${info.id||''}" style="max-width:605px;min-width:325px;"><section> <a href="${useUrl}">ดูคลิปใน TikTok</a> </section></blockquote>`;
-        return { type:'tiktok', src: useUrl, html, provider:'tiktok' };
-      }
-
-      // ถ้าเป็นไฟล์วิดีโอ (mp4/webm/ogg)
-      try{
-        new URL(videoUrl);
-        if(/\.(mp4|webm|ogg)(\?|$)/i.test(videoUrl)){
-          const html = `<video controls src="${videoUrl}" style="width:100%; border-radius:12px; margin-top:10px;"></video>`;
-          return { type:'video', src: videoUrl, html, provider:'file' };
-        }
-        // ถ้าเป็น URL อื่น ๆ ให้คืนลิงก์เป็น fallback
-        return { type:'link', src: videoUrl, html: `<a href="${videoUrl}" target="_blank" rel="noopener">${videoUrl}</a>`, provider:'link' };
-      }catch(e){
-        return { type:null, src:null, html:null, provider:null };
-      }
-    }
-
-    // เปลี่ยน input ให้เป็นรูปแบบที่เก็บไว้ใน recipe.videoUrl (normalize)
-    function normalizeVideoUrl(input){
-      if(!input) return '';
-      const info = extractVideoId(input);
-      if(info.provider === 'youtube' && info.id){
-        return `https://www.youtube.com/watch?v=${info.id}`;
-      }
-      if(info.provider === 'tiktok' && info.url){
-        return info.url;
-      }
-      try{
-        new URL(input);
-        return input;
-      }catch{
-        return '';
-      }
-    }
-
-    // ---------- Data (seed) ----------
-    const seed = () => {
-      // สร้างรูปตัวอย่าง
-      const demoImg = (txt) => `https://dummyimage.com/800x500/ffc2d6/7f2d47.jpg&text=${encodeURIComponent(txt)}`;
-
-      // ฟังก์ชันช่วย: ยืดหยุ่น รับทั้ง ID หรือ URL (ใช้ใน seed)
-      const VideoURL = (v) => {
-        if(!v) return '';
-        if(/tiktok\.com/i.test(v)) return v;
-        if(/^https?:\/\//i.test(v)) return v;
-        if(/^[A-Za-z0-9_-]{6,}$/.test(v)) return `https://www.youtube.com/watch?v=${v}`;
-        return v;
-      };
-
-      const list = [];
-      // ไอศกรีม 
-      list.push({id:uid(), title:'ไอศกรีมนมสด',category:'ไอศกรีม', image:('https://i.ytimg.com/vi/HQZdrjtW4zU/maxresdefault.jpg'), author:'L', ingredients:['นมสด 500 มล.','วิปครีม 200 มล.','น้ำตาล 80 กรัม','วานิลลา 1 ช้อนชา'], steps:['ผสมนม วิปครีม น้ำตาล วานิลลา','คนจนน้ำตาลละลาย','เทใส่ภาชนะ แช่แข็ง 4-6 ชม.','ทุก 30 นาที นำออกมาคน 2-3 ครั้ง'], videoUrl: VideoURL('https://youtu.be/HQZdrjtW4zU?si=PD')});
-      list.push({id:uid(), title:'ไอศกรีมวานิลลา', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/1vCnGjZzTsU/maxresdefault.jpg'), author:'L', ingredients:['ไข่แดง 4 ฟอง','นม 400 มล.','ครีม 300 มล.','วานิลลา 1 ช้อนชา','น้ำตาล 120 กรัม'], steps:['อุ่นนม+น้ำตาล','เทลงไข่แดง คนจนข้น','ผสมครีมและวานิลลา','ปั่น/แช่แข็ง'], videoUrl: VideoURL('https://youtu.be/1vCnGjZzTsU?si=LchKOeEAxI8u3H7Q')});
-      list.push({id:uid(), title:'ไอศกรีมช็อกโกแลต', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/9L0L20wqeks/sddefault.jpg'), author:'L', ingredients:['ผงโกโก้ 40 กรัม','ช็อกโกแลต 100 กรัม','ครีม 300 มล.','นม 300 มล.','น้ำตาล 100 กรัม'], steps:['อุ่นนม+ครีม','ละลายช็อกโกแลตและโกโก้','แช่ให้เย็น','ปั่น/แช่แข็ง'], videoUrl: VideoURL('https://youtu.be/IoiiNQoBe-Y?si=rM0YbR00BOyoxBv9')});
-      list.push({id:uid(), title:'ไอศกรีมทุเรียน', category:'ไอศกรีม', image:('https://i.ytimg.com/vi/O1qHjuOhgo0/maxresdefault.jpg'), author:'L', ingredients:['ทุเรียน 500 กรัม.','น้ำตาล 100 กรัม','เกลือหยิบมือ','นมจีด 500 ml '], steps:['ละลายน้ำตาลในนมจืด','เติมเกลือ','ใส่เนื้อทุเรียน','แช่แข็ง/คนระหว่างแช่'], videoUrl: VideoURL('https://youtu.be/O1qHjuOhgo0?si=plwJznmUHvsTx28T')});
-      list.push({id:uid(), title:'ไอศกรีมสตรอว์เบอร์รี', category:'ไอศกรีม', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqMi4-V-EikcgTTocWS_wkQXbWgSeoBZzv75etpsZe_in5U0mV2zUNklcX1e2dIUpGLns&usqp=CAU'), author:'Aommy', ingredients:['สตรอว์เบอร์รีบด 300 กรัม','ครีม 300 มล.','นม 200 มล.','น้ำตาล 90 กรัม'], steps:['บดสตรอว์เบอร์รี','ผสมกับครีม นม น้ำตาล','แช่เย็นจัด','ปั่น/แช่แข็ง'], videoUrl: VideoURL('https://youtu.be/mDIsEHfG4HM?si=ahQ6zX9AAxHXsIMd')});
-      // เค้ก 
-      list.push({id:uid(), title:'เค้กส้มฉ่ำ', category:'เค้ก', image:('https://static.cdntap.com/tap-assets-prod/wp-content/uploads/sites/25/2022/02/orange-cake-lead.jpg'), author:'L', ingredients:['แป้งเค้ก 200 กรัม','ไข่ 3 ฟอง','น้ำส้ม 120 มล.','เนย 100 กรัม','น้ำตาล 120 กรัม'], steps:['ตีไข่กับน้ำตาล','ใส่แป้งและเนย','เติมน้ำส้ม','อบ 170°C 30-35 นาที'], videoUrl: VideoURL('https://youtu.be/AMC6TL3tHCU?si=huKpg0OzOfQkV6Wv')});
-      list.push({id:uid(), title:'ชิฟฟอนชาไทย', category:'เค้ก', image:('https://f.ptcdn.info/392/080/000/rtd62o22gbmJb6tO8I9bo-o.jpg'), author:'L', ingredients:['แป้งเค้ก 180 กรัม','ชาไทยเข้ม 150 มล.','ไข่ 4 ฟอง','น้ำตาล 130 กรัม','น้ำมัน 60 มล.'], steps:['ผสมของเหลว','ร่อนแป้ง','ตีไข่ขาวตั้งยอด','ตะล่อมรวมกัน','อบ 170°C 35 นาที'], videoUrl: VideoURL('https://youtu.be/VWysSH5Ypm0?si=5QXzncgyIS_DEppM')});
-      list.push({id:uid(), title:'เค้กช็อกโกแลตหน้านิ่ม', category:'เค้ก', image:('https://i.ytimg.com/vi/bIvRLl-R1Ho/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 200 กรัม','โกโก้ 30 กรัม','นม 200 มล.','ไข่ 3 ฟอง','น้ำตาล 150 กรัม'], steps:['ผสมส่วนแห้ง','เติมของเหลว','อบ 170°C 30 นาที','ทำหน้าช็อกโกแลต เทราด'], videoUrl: VideoURL('https://youtu.be/bIvRLl-R1Ho?si=rGTm5KYOztBAFjNh')});
-      list.push({id:uid(), title:'ชีสเค้กอบ', category:'เค้ก', image:('https://recipe.sgethai.com/wp-content/uploads/2025/04/cover-basque-burnt-cheese-cake.webp'), author:'L', ingredients:['ครีมชีส 500 กรัม','น้ำตาล 120 กรัม','ไข่ 3 ฟอง','วิปครีม 150 มล.','บิสกิตบด 150 กรัม'], steps:['ทำฐานบิสกิต','ตีครีมชีสกับน้ำตาล','เติมไข่และครีม','อบ 160°C 45-55 นาที'], videoUrl: VideoURL('https://youtu.be/xLiMoHmYR14?si=x6e_gcfk3B1Df8Jb')});
-      list.push({id:uid(), title:'เค้กกล้วยหอม', category:'เค้ก', image:('https://i.ytimg.com/vi/lwXwD1WG3e4/maxresdefault.jpg'), author:'L', ingredients:['กล้วย 3 ผลสุก','แป้ง 200 กรัม','ไข่ 2 ฟอง','น้ำตาล 120 กรัม','น้ำมัน 80 มล.'], steps:['บดกล้วย','ผสมส่วนผสมทั้งหมด','อบ 175°C 35-40 นาที'], videoUrl: VideoURL('https://youtu.be/FV47VIgvYEs?si=0qw_0Aiwl4wAI48C')});
-      // น้ำปั่น 
-      list.push({id:uid(), title:'สมูทตี้สตรอว์เบอร์รี-กล้วย', category:'น้ำปั่น', image:('https://today-obs.line-scdn.net/0hwMhlixjAKGJVFTxNyu1XNW1DJBNmczJrd3thDHlFIwd-OW09OnF7AXZAIU5wdz80dSFnU3IRI1t-JDtnPA/w280'), author:'L', ingredients:['สตรอว์เบอร์รี 1 ถ้วย','กล้วย 1 ผล','โยเกิร์ต 1/2 ถ้วย','น้ำผึ้ง 1 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ใส่ทุกอย่างลงเครื่องปั่น','ปั่นจนเนียน เสิร์ฟทันที'], videoUrl: VideoURL('https://youtu.be/1EjS3VR77wE?si=HtdqpbAbMZxB4RRz')});
-      list.push({id:uid(), title:'มะม่วงโยเกิร์ตปั่น', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_emoKzscYjbq-q9Q848TV3hCmaS5EUvbPcw&s'), author:'L', ingredients:['มะม่วงสุก 1 ถ้วย','โยเกิร์ต 1/2 ถ้วย','นม 1/2 ถ้วย','น้ำผึ้ง 1 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทุกอย่างเข้าด้วยกัน','ชิมรส ปรับหวาน'], videoUrl:VideoURL('https://youtu.be/R0XLH2mgsBk?si=ATwxQu-efCmEZDWL')}) 
-      list.push({id:uid(), title:'แตงโมปั่นเย็นฉ่ำ', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC-JFVpW5P5AHMRgMywgI5QKV3U6lcbxWgFA&s'), author:'L', ingredients:['แตงโมหั่น 2 ถ้วย','น้ำเชื่อม 1-2 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทั้งหมด','เสิร์ฟพร้อมใบสะระแหน่'], videoUrl:VideoURL('https://youtu.be/2ttVIkPQFwc?si=TgBhB0NQHZt_PVKY')});
-      list.push({id:uid(), title:'สับปะรดมินต์ปั่น', category:'น้ำปั่น', image:('https://i.ytimg.com/vi/rerMjL21ceg/mqdefault.jpg'), author:'L', ingredients:['สับปะรด 1 ถ้วย','ใบมินต์ 6-8 ใบ','โซดา 1/2 ถ้วย','น้ำแข็ง'], steps:['ปั่นสับปะรดกับน้ำแข็ง','เทใส่แก้ว เติมโซดาและมินต์'], videoUrl:VideoURL('https://youtu.be/LKasigS4r5c?si=iYpimpipivSM6Vbs')});
-      list.push({id:uid(), title:'กาแฟปั่นคาราเมล', category:'น้ำปั่น', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5z6CKn33iksAXpE4IXpDR4lSRQy2FNHFBCw&s'), author:'L', ingredients:['เอสเปรสโซ 1 ช็อต','นม 1/2 ถ้วย','คาราเมลไซรัป 2 ช้อนโต๊ะ','น้ำแข็ง'], steps:['ปั่นทั้งหมดจนเข้ากัน','ราดคาราเมลเพิ่มได้ตามชอบ'], videoUrl:VideoURL('https://youtu.be/HniMRESObvE?si=69Y9fFU0yIN9f5Zm')});
-      // คุกกี้ 
-      list.push({id:uid(), title:'คุกกี้ช็อกชิพ', category:'คุกกี้', image:('https://i.ytimg.com/vi/_7KghXqc4Qk/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 220 กรัม','เนย 120 กรัม','น้ำตาล 120 กรัม','ไข่ 1 ฟอง','ช็อกชิพ 120 กรัม'], steps:['ตีเนยกับน้ำตาล','ใส่ไข่และแป้ง','ใส่ช็อกชิพ','อบ 180°C 10-12 นาที'], videoUrl:VideoURL('https://youtu.be/dzkfeVFnV4A?si=atF2LoPo7m0jID74')});
-      list.push({id:uid(), title:'คุกกี้โอ๊ตลูกเกด', category:'คุกกี้', image:('https://i.ytimg.com/vi/ZXHP-3si_hU/maxresdefault.jpg'), author:'L', ingredients:['โอ๊ต 150 กรัม','แป้ง 100 กรัม','เนย 100 กรัม','น้ำตาล 90 กรัม','ลูกเกด 80 กรัม'], steps:['ผสมส่วนผสมทั้งหมด','ตักวางถาด','อบ 175°C 12-15 นาที'], videoUrl:VideoURL('https://youtu.be/OaQy40o7I8A?si=dNqprgWvuDpr4saW')});
-      list.push({id:uid(), title:'คุกกี้งาขี้ม่อน', category:'คุกกี้', image:('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTaW1eXOfOloNq6OklSyR2m5ryFzMKrdTzbZw&s'), author:'L', ingredients:['แป้ง 200 กรัม','งาขี้ม่อน 50 กรัม','น้ำตาล 80 กรัม','เนย 120 กรัม','ไข่ 1 ฟอง'], steps:['ผสมส่วนผสม','ปั้นกดแบน','อบ 175°C 12 นาที'], videoUrl:VideoURL('https://youtu.be/1wE_QgEF2uk?si=J6gCNqi-GJ7nA_CD')});
-      list.push({id:uid(), title:'คุกกี้เนยวานิลลา', category:'คุกกี้', image:('https://i.ytimg.com/vi/I1tsliG101Y/maxresdefault.jpg'), author:'L ', ingredients:['แป้ง 220 กรัม','เนย 150 กรัม','น้ำตาลไอซิ่ง 80 กรัม','วานิลลา 1 ช้อนชา','ไข่ 1 ฟอง'], steps:['ตีเนย+ไอซิ่ง','ใส่ไข่+วานิลลา','ใส่แป้ง','อบ 170°C 12-15 นาที'], videoUrl:VideoURL('https://youtu.be/Y9UdCT43CAA?si=VAmwnKMAwNHcNf8_')});
-      list.push({id:uid(), title:'คุกกี้มัทฉะไวท์ช็อก', category:'คุกกี้', image:('https://i.ytimg.com/vi/yqR0STrOcKk/maxresdefault.jpg'), author:'L', ingredients:['แป้ง 220 กรัม','ผงมัทฉะ 10 กรัม','เนย 150 กรัม','น้ำตาล 100 กรัม','ไวท์ช็อก 120 กรัม'], steps:['ผสมแห้ง','ตีเนยกับน้ำตาล','รวมส่วนผสม','อบ 175°C 12 นาที'], videoUrl:VideoURL('https://youtu.be/2nrwOB7DkJc?si=yzEwWBUatr2E_DmU')});
-      return list.map(r=>({...r, image:r.image }));
+      shop_title: "ร้านค้าออนไลน์",
+      shop_tagline: "เลือกสินค้า ใส่ตะกร้า และชำระเงินในหน้าเดียว",
+      home_heading: "สินค้าแนะนำ",
+      checkout_heading: "เช็คเอาต์ & ชำระเงิน (ตัวอย่าง)",
+      checkout_subheading:
+        "เลือกที่อยู่จัดส่งและยืนยันคำสั่งซื้อ (ไม่มีการชำระเงินจริง)",
+      customer_info_label: "ข้อมูลลูกค้า",
+      shipping_info_label: "ที่อยู่จัดส่ง",
+      order_summary_label: "สรุปคำสั่งซื้อ",
+      place_order_button_text: "ยืนยันคำสั่งซื้อ (ตัวอย่าง)",
+      footer_note: "ส่วนนี้เป็นตัวอย่างหน้าร้านค้าออนไลน์เท่านั้น"
     };
 
-    function loadRecipes(){
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(raw){ try{ return JSON.parse(raw); }catch{ return []; } }
-      return seed();
-    }
+    function applyConfigToUI(config) {
+      const cfg = Object.assign({}, defaultConfig, config || {});
+      const root = document.getElementById("app-shell");
 
-    function saveRecipes(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes)); }
+      const baseFontStack = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+      const fontFamily = cfg.font_family || defaultConfig.font_family;
+      const baseSize = cfg.font_size || defaultConfig.font_size;
 
-    function loadFavs(){ try{ return new Set(JSON.parse(localStorage.getItem(FAV_KEY)||'[]')); }catch{ return new Set(); } }
-    function saveFavs(){ localStorage.setItem(FAV_KEY, JSON.stringify([...favs])); }
-
-    function applyTheme(initial=false){
-      const mode = localStorage.getItem(THEME_KEY)||'light';
-      document.body.classList.toggle('dark', mode==='dark');
-      if(!initial) localStorage.setItem(THEME_KEY, mode);
-    }
-
-    // ---------- State ----------
-    let recipes = loadRecipes();
-    let favs = loadFavs();
-    let filter = { cat:'all', q:'', favOnly:false };
-
-    // ---------- Render ----------
-    const grid = $('#grid');
-    const emptyEl = $('#empty');
-
-    function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
-
-    function cardTemplate(r){
-      const isFav = favs.has(r.id);
-      return `
-        <article class="card" data-id="${r.id}">
-          <div class="thumb">
-            <img loading="lazy" src="${r.image}" alt="${r.title}" data-open="${r.id}">
-            <span class="cat-chip">${r.category}</span>
-          </div>
-          <div class="card-body">
-            <div class="avatar">${initials(r.author)}</div>
-            <div class="info">
-              <h3 class="name">${r.title}</h3>
-              <div class="by">โดย ${r.author}</div>
-            </div>
-            <button class="heart ${isFav?'fav':''}" title="กดหัวใจ" data-like>❤</button>
-          </div>
-        </article>
-      `;
-    }
-
-    function render(){
-      let list = recipes.slice();
-      if(filter.cat !== 'all') list = list.filter(r=>r.category===filter.cat);
-      if(filter.q){
-        const q = filter.q.toLowerCase();
-        list = list.filter(r=> r.title.toLowerCase().includes(q) || (r.author||'').toLowerCase().includes(q));
+      if (root) {
+        root.style.backgroundColor =
+          cfg.background_color || defaultConfig.background_color;
+        root.style.color = cfg.text_color || defaultConfig.text_color;
+        root.style.fontFamily = fontFamily + ", " + baseFontStack;
+        root.style.fontSize = baseSize + "px";
       }
-      if(filter.favOnly){ list = list.filter(r=>favs.has(r.id)); }
 
-      grid.innerHTML = list.map(cardTemplate).join('');
-      emptyEl.style.display = list.length? 'none':'block';
+      const appRoot = document.getElementById("app-root");
+      if (appRoot) {
+        appRoot.style.backgroundColor =
+          cfg.background_color || defaultConfig.background_color;
+      }
+
+      const surfaces = document.querySelectorAll(
+        ".bg-surface-dynamic, .surface-panel"
+      );
+      surfaces.forEach((el) => {
+        el.style.backgroundColor = cfg.surface_color || defaultConfig.surface_color;
+      });
+
+      const header = document.querySelector("header");
+      if (header) {
+        header.style.backgroundColor =
+          cfg.primary_action_color || defaultConfig.primary_action_color;
+      }
+
+      const textEls = document.querySelectorAll(".dynamic-text");
+      textEls.forEach((el) => {
+        el.style.color = cfg.text_color || defaultConfig.text_color;
+      });
+
+      const primaryButtons = document.querySelectorAll(".btn-primary-main");
+      primaryButtons.forEach((btn) => {
+        btn.style.backgroundColor =
+          cfg.primary_action_color || defaultConfig.primary_action_color;
+      });
+
+      const secondaryEls = document.querySelectorAll(".accent-secondary");
+      secondaryEls.forEach((el) => {
+        el.style.backgroundColor =
+          cfg.secondary_action_color ||
+          defaultConfig.secondary_action_color;
+      });
+
+      const titleEl = document.getElementById("shop-title");
+      const taglineEl = document.getElementById("shop-tagline");
+      const homeHeadingEl = document.getElementById("home-heading");
+      const checkoutHeadingEl = document.getElementById("checkout-heading");
+
+      if (titleEl) titleEl.style.fontSize = baseSize * 1.1 + "px";
+      if (taglineEl) taglineEl.style.fontSize = baseSize * 0.75 + "px";
+      if (homeHeadingEl) homeHeadingEl.style.fontSize = baseSize * 1.1 + "px";
+      if (checkoutHeadingEl)
+        checkoutHeadingEl.style.fontSize = baseSize * 1.1 + "px";
+
+      const smallLabels = document.querySelectorAll(".text-xs, .text-[11px]");
+      smallLabels.forEach((el) => {
+        el.style.fontSize = baseSize * 0.8 + "px";
+      });
+
+      const bodyText = document.querySelectorAll(".body-text");
+      bodyText.forEach((el) => {
+        el.style.fontSize = baseSize + "px";
+      });
+
+      const textMap = {
+        "shop-title": "shop_title",
+        "shop-tagline": "shop_tagline",
+        "home-heading": "home_heading",
+        "checkout-heading": "checkout_heading",
+        "checkout-subheading": "checkout_subheading",
+        "customer-info-label": "customer_info_label",
+        "shipping-info-label": "shipping_info_label",
+        "order-summary-label": "order_summary_label"
+      };
+
+      Object.keys(textMap).forEach((id) => {
+        const key = textMap[id];
+        const el = document.getElementById(id);
+        if (el) {
+          el.textContent = cfg[key] || defaultConfig[key];
+        }
+      });
+
+      const placeOrderBtn = document.getElementById("place-order-btn");
+      if (placeOrderBtn) {
+        placeOrderBtn.textContent =
+          cfg.place_order_button_text ||
+          defaultConfig.place_order_button_text;
+      }
     }
 
-    // ---------- Detail Modal ----------
-    const viewModal = $('#viewModal');
-    const viewTitle = $('#viewTitle');
-    const viewImage = $('#viewImage');
-    const viewMeta = $('#viewMeta');
-    const viewIngredients = $('#viewIngredients');
-    const viewSteps = $('#viewSteps');
-    const viewVideoWrap = $('#viewVideoWrap');
+    (function initElementSdk() {
+      if (!window.elementSdk) {
+        applyConfigToUI(defaultConfig);
+        return;
+      }
 
-    function openView(id){
-      const r = recipes.find(x=>x.id===id);
-      if(!r) return;
-      viewTitle.textContent = r.title;
-      viewImage.src = r.image;
-      viewImage.alt = r.title;
-      viewMeta.textContent = `หมวดหมู่: ${r.category} • โดย ${r.author}`;
-      viewIngredients.innerHTML = r.ingredients.map(i=>`<li>${i}</li>`).join('');
-      viewSteps.innerHTML = r.steps.map(s=>`<li>${s}</li>`).join('');
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          applyConfigToUI(config);
+        },
+        mapToCapabilities: (config) => {
+          const cfg = config || defaultConfig;
 
-      // วิดีโอ
-      viewVideoWrap.innerHTML = '';
-
-      // ถ้ามีไฟล์อัปโหลด (object URL) เล่นตรงๆ
-      if(r._videoObjectUrl){
-        const v = document.createElement('video');
-        v.controls = true; v.src = r._videoObjectUrl; v.style.width='100%'; v.style.borderRadius='12px'; v.style.marginTop='10px';
-        viewVideoWrap.appendChild(v);
-
-      } else if(r.videoUrl){
-        const emb = embedFor(r.videoUrl);
-        console.log('DEBUG: recipe.videoUrl ->', r.videoUrl, ' embedFor ->', emb);
-
-        if(emb && emb.html){
-          // แทรก HTML (iframe / blockquote / video)
-          viewVideoWrap.insertAdjacentHTML('beforeend', emb.html);
-
-          // ถ้าเป็น TikTok ให้โหลดสคริปต์ของ TikTok เพื่อ render blockquote
-          if(emb.provider === 'tiktok'){
-            if(!document.querySelector('script[src="https://www.tiktok.com/embed.js"]')){
-              const s = document.createElement('script');
-              s.src = 'https://www.tiktok.com/embed.js';
-              s.async = true;
-              document.body.appendChild(s);
-            } else {
-              // ถ้ามีแล้ว ลอง re-insert เพื่อให้สคริปต์รันอีกครั้ง (บางเวอร์ชันจะสแกนตอนโหลดเท่านั้น)
-              try{
-                const existing = document.querySelector('script[src="https://www.tiktok.com/embed.js"]');
-                if(existing){
-                  existing.parentNode.removeChild(existing);
-                  const s2 = document.createElement('script');
-                  s2.src = 'https://www.tiktok.com/embed.js';
-                  s2.async = true;
-                  document.body.appendChild(s2);
-                }
-              }catch(e){
-                // ignore
+          const recolorables = [
+            {
+              get: () => cfg.background_color || defaultConfig.background_color,
+              set: (value) => {
+                cfg.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => cfg.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                cfg.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => cfg.text_color || defaultConfig.text_color,
+              set: (value) => {
+                cfg.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () =>
+                cfg.primary_action_color ||
+                defaultConfig.primary_action_color,
+              set: (value) => {
+                cfg.primary_action_color = value;
+                window.elementSdk.setConfig({
+                  primary_action_color: value
+                });
+              }
+            },
+            {
+              get: () =>
+                cfg.secondary_action_color ||
+                defaultConfig.secondary_action_color,
+              set: (value) => {
+                cfg.secondary_action_color = value;
+                window.elementSdk.setConfig({
+                  secondary_action_color: value
+                });
               }
             }
-          }
-        } else {
-          // fallback: ถ้า embedFor คืน type video ให้สร้าง video element
-          if(emb && emb.type === 'video' && emb.src){
-            const v = document.createElement('video');
-            v.controls = true; v.src = emb.src; v.style.width='100%'; v.style.borderRadius='12px'; v.style.marginTop='10px';
-            viewVideoWrap.appendChild(v);
-          } else {
-            const p = document.createElement('div');
-            p.className = 'meta';
-            p.textContent = 'ไม่สามารถโหลดวิดีโอได้ (ลิงก์ไม่ถูกต้องหรือถูกจำกัดการฝัง)';
-            viewVideoWrap.appendChild(p);
-          }
-        }
-      }
+          ];
 
-      viewModal.classList.add('show');
-    }
+          const fontEditable = {
+            get: () => cfg.font_family || defaultConfig.font_family,
+            set: (value) => {
+              cfg.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          };
 
-    function closeView(){ viewModal.classList.remove('show'); }
+          const fontSizeable = {
+            get: () => cfg.font_size || defaultConfig.font_size,
+            set: (value) => {
+              cfg.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          };
 
-    // ---------- Add Modal ----------
-    const addModal = $('#addModal');
-    const addForm = $('#addForm');
-
-    function openAdd(){
-      // เติมชื่อผู้โพสต์จาก username
-      const user = localStorage.getItem(USER_KEY)||'';
-      $('#authorField').value = user;
-      addModal.classList.add('show');
-    }
-    function closeAdd(){ addModal.classList.remove('show'); addForm.reset(); }
-
-    addForm.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const fd = new FormData(addForm);
-      const title = (fd.get('title')||'').toString().trim();
-      const category = fd.get('category');
-      const ingredients = (fd.get('ingredients')||'').toString().split(/\n+/).map(s=>s.trim()).filter(Boolean);
-      const steps = (fd.get('steps')||'').toString().split(/\n+/).map(s=>s.trim()).filter(Boolean);
-      const author = (fd.get('author')||'').toString().trim() || 'ผู้ใช้ไม่ระบุชื่อ';
-      const videoUrl = (fd.get('videoUrl')||'').toString().trim();
-      const videoFile = fd.get('videoFile');
-      const imageFile = fd.get('image');
-
-      if(!title || !category || !ingredients.length || !steps.length || !imageFile || !imageFile.size){
-        alert('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
-        return;
-      }
-
-      const image = await toBase64(imageFile);
-      const rec = { id:uid(), title, category, author, image, ingredients, steps };
-      if(videoUrl){
-        const normalized = normalizeVideoUrl(videoUrl);
-        if(!normalized){
-          alert('ลิงก์วิดีโอไม่ถูกต้อง กรุณาตรวจสอบ (รองรับ YouTube/TikTok หรือไฟล์ mp4)');
-          return;
-        }
-        rec.videoUrl = normalized;
-      }
-      if(videoFile && videoFile.size){
-        // ไม่เก็บถาวรใน localStorage แต่เล่นในรอบนี้ได้
-        rec._videoObjectUrl = URL.createObjectURL(videoFile);
-      }
-
-      recipes.unshift(rec);
-      saveRecipes();
-      render();
-      closeAdd();
-    });
-
-    // ---------- Events ----------
-    // เปิด/ปิด Drawer
-    const drawer = $('#drawer');
-    $('#openDrawer').addEventListener('click', ()=> drawer.classList.add('show'));
-    $$('[data-close-drawer]').forEach(el=> el.addEventListener('click', ()=> drawer.classList.remove('show')));
-
-    // ปุ่มใน Drawer
-    $('#openAdd').addEventListener('click', ()=>{ drawer.classList.remove('show'); openAdd(); });
-    $('#showAll').addEventListener('click', ()=>{ filter.favOnly=false; filter.q=''; $('#searchInput').value=''; drawer.classList.remove('show'); render(); });
-    $('#showFavs').addEventListener('click', ()=>{ filter.favOnly = true; drawer.classList.remove('show'); render(); });
-
-    // ค้นหา
-    $('#searchInput').addEventListener('input', (e)=>{ filter.q = e.target.value.trim(); render(); });
-
-    // จัดการชื่อผู้ใช้
-    const usernameInput = $('#usernameInput');
-    usernameInput.value = localStorage.getItem(USER_KEY)||'';
-    usernameInput.addEventListener('change', (e)=>{ localStorage.setItem(USER_KEY, e.target.value.trim()); });
-
-    // Tabs หมวดหมู่
-    const tabs = $('#tabs');
-    tabs.addEventListener('click', (e)=>{
-      const btn = e.target.closest('.tab');
-      if(!btn) return;
-      $$('.tab', tabs).forEach(t=>t.classList.remove('active'));
-      btn.classList.add('active');
-      filter.cat = btn.dataset.cat;
-      filter.favOnly = false; // ออกจากโหมดโปรดเมื่อกดแท็บใหม่
-      render();
-    });
-
-    // คลิกในกริด: like / open
-    grid.addEventListener('click', (e) => {
-      const likeBtn = e.target.closest('[data-like]');
-      const img = e.target.closest('img');
-      const card = e.target.closest('.card');
-      if (!card) return;
-
-      const id = card.dataset.id;
-
-      // กดหัวใจ
-      if (likeBtn) {
-        if (favs.has(id)) favs.delete(id);
-        else favs.add(id);
-        saveFavs();
-        render();
-        return;
-      }
-
-      // กดรูป
-      if (img) {
-        openView(id);
-        return;
-      }
-    });
-
-    // ปิดโมดอล (คลิกที่ backdrop)
-    viewModal.addEventListener('click', (e)=>{ if(e.target.hasAttribute('data-close-modal')) closeView(); });
-    addModal.addEventListener('click', (e)=>{ if(e.target.hasAttribute('data-close-add')) closeAdd(); });
-
-    // ปุ่มธีม
-    const themeToggle = $('#themeToggle');
-    themeToggle.addEventListener('click', ()=>{
-      const cur = localStorage.getItem(THEME_KEY)||'light';
-      const next = cur==='light'? 'dark' : 'light';
-      localStorage.setItem(THEME_KEY, next);
-      applyTheme();
-    });
-
-    // ---------- Init ----------
-    (function init(){
-      applyTheme(true);
-      render();
-      // ฟังค์ชันทดสอบเปิดคีย์บอร์ดเข้าถึง: กด ESC ปิดโมดอล/เมนู
-      window.addEventListener('keydown', (e)=>{
-        if(e.key==='Escape'){
-          if(addModal.classList.contains('show')) closeAdd();
-          else if(viewModal.classList.contains('show')) closeView();
-          else drawer.classList.remove('show');
+          return {
+            recolorables,
+            borderables: [],
+            fontEditable,
+            fontSizeable
+          };
+        },
+        mapToEditPanelValues: (config) => {
+          const cfg = Object.assign({}, defaultConfig, config || {});
+          return new Map([
+            ["shop_title", cfg.shop_title],
+            ["shop_tagline", cfg.shop_tagline],
+            ["home_heading", cfg.home_heading],
+            ["checkout_heading", cfg.checkout_heading],
+            ["checkout_subheading", cfg.checkout_subheading],
+            ["customer_info_label", cfg.customer_info_label],
+            ["shipping_info_label", cfg.shipping_info_label],
+            ["order_summary_label", cfg.order_summary_label],
+            ["place_order_button_text", cfg.place_order_button_text],
+            ["footer_note", cfg.footer_note]
+          ]);
         }
       });
     })();
- </script>
- </body>
+
+    // ------- APP STATE --------
+    let isLoggedIn = false;
+    let currentUser = null;
+    let savedAddresses = [];
+    let selectedAddressId = null;
+    let editingAddressId = null;
+    let isAdmin = false;
+
+    // Admin credentials (for demo purposes)
+    const ADMIN_EMAIL = "admin@shop.com";
+    const ADMIN_PASSWORD = "admin123";
+
+    const products = [
+      {
+        id: "p1",
+        name: "แก้วน้ำสเตนเลสมินิมอล",
+        short: "เก็บอุณหภูมิได้ยาวนาน ดีไซน์เรียบหรู",
+        long: "แก้วน้ำสเตนเลสขนาด 420 มล. ฝาปิดซิลิโคนเกรดอาหาร เก็บความเย็นได้นานถึง 8 ชม. และความร้อนได้นานถึง 4 ชม.",
+        price: 290,
+        emoji: "🥤"
+      },
+      {
+        id: "p2",
+        name: "สมุดโน้ตปกผ้า",
+        short: "กระดาษเนื้อดี เขียนไม่ซึม",
+        long: "สมุดโน้ตปกผ้าขนาด A5 จำนวน 160 หน้า เย็บเล่มแบบด้าย เปิดกางแล้วไม่เด���ง เหมาะสำหรับจดงานหรือ bullet journal",
+        price: 180,
+        emoji: "📓"
+      },
+      {
+        id: "p3",
+        name: "เทียนหอมกลิ่นลาเวนเดอร์",
+        short: "ให้ความผ่อนคลายก่อนนอน",
+        long: "เทียนหอมทำจากขี้ผึ้งธรรมชาติ กลิ่นลาเวนเดอร์จากน้ำมันหอมระเหยธรรมชาติ ให้กลิ่นหอมละมุน ไม่แสบจมูก",
+        price: 220,
+        emoji: "🕯️"
+      },
+      {
+        id: "p4",
+        name: "ถุงผ้ารักษ์โลก",
+        short: "เหนียว ทน พับเก็บง่าย",
+        long: "ถุงผ้าคอตตอนลายเรียบ น้ำหนักเบา รับน้ำหนักได้ถึง 10 กิโลกรัม ซักทำความสะอาดได้ ใช้ซ้ำได้หลายครั้ง",
+        price: 150,
+        emoji: "🛍️"
+      },
+      {
+        id: "p5",
+        name: "หูฟังบลูทูธไร้สาย",
+        short: "เสียงใส คุณภาพสูง ใช้งานได้นาน",
+        long: "หูฟังบลูทูธ 5.0 เสียงคุณภาพ HD พร้อมระบบตัดเสียงรบกวน แบตเตอรี่ใช้งานได้ 20 ชั่วโมง กันน้ำ IPX5",
+        price: 890,
+        emoji: "🎧"
+      },
+      {
+        id: "p6",
+        name: "��ระเป๋าสะพายหนัง PU",
+        short: "ดีไซน์เรียบหรู จุของได้เยอะ",
+        long: "กระเป๋าสะพายหนัง PU คุณภาพดี มีช่องใส่ของหลายช่อง ขนาดกำลังดี เหมาะกับการใช้งานประจำวัน",
+        price: 650,
+        emoji: "👜"
+      },
+      {
+        id: "p7",
+        name: "แว่นกันแดด UV400",
+        short: "ป้องกันแสง UV ได้ 100%",
+        long: "แว่นกันแดดเลนส์โพลาไรซ์ กรองแสง UV400 กรอบแข็งแรง น้ำหนักเบา สวมใส่สบาย พร้อมกล่องและผ้าเช็ด",
+        price: 450,
+        emoji: "🕶️"
+      },
+      {
+        id: "p8",
+        name: "ลำ��พงบลูทูธพกพา",
+        short: "เสียงดัง ชัด เบสหนัก",
+        long: "ลำโพ��บลูทูธกันน้ำ IPX7 กำลังขับ 10W เสียงเบสหนัก แบตเตอรี่ใช้งาน 12 ชั่วโมง เชื่อมต่อได้ 2 เครื่อง",
+        price: 790,
+        emoji: "🔊"
+      },
+      {
+        id: "p9",
+        name: "นาฬิกาข้อมือสมาร์ทวอทช์",
+        short: "วัดชีพจร นับก้าว แจ้งเตือนข้อความ",
+        long: "สมาร์ทวอทช์จอสัมผัส 1.4 นิ้ว วัดอัตราการเต้นหัวใจ นับก้าว วัดแคลอรี่ กันน้ำ IP68 แบตเตอรี่ 7 วัน",
+        price: 1290,
+        emoji: "⌚"
+      },
+      {
+        id: "p10",
+        name: "เมาส์ไร้สายเงียบ",
+        short: "คลิกเงียบ ไม่รบกวน ใช้งานสบาย",
+        long: "เมาส์ไร้สาย 2.4GHz ระบบคลิกเงียบ DPI ปรับได้ 800-1600 ประหยัดพลังงาน ใช้แบตเตอรี่��ด้นาน 12 เดือน",
+        price: 320,
+        emoji: "🖱️"
+      },
+      {
+        id: "p11",
+        name: "คีย์บอร์ดเมคคานิคอล",
+        short: "สวิตช์ Blue ตอบสนองเร็ว เสียงคลิกชัด",
+        long: "คีย์บอร์ดเมคคานิคอล 87 คีย์ สวิตช์ Blue ไฟ RGB ปรับได้หลายโหมด สายถอดได้ เหมาะสำหรับเกมและทำงาน",
+        price: 1590,
+        emoji: "⌨️"
+      },
+      {
+        id: "p12",
+        name: "แท่นชาร์จไร้สาย 3in1",
+        short: "ชาร์จมือถือ นาฬิกา หูฟัง พร้อมกัน",
+        long: "แท่นชาร์จไร้สาย 3 in 1 รองรับ iPhone, Apple Watch, AirPods ชาร์จเร็ว 15W ป��องกันความร้อนเกิน",
+        price: 890,
+        emoji: "🔌"
+      },
+      {
+        id: "p13",
+        name: "กระบอกน้ำแก้วสูญญากาศ",
+        short: "เก็บความเย็น 24 ชม. ความร้อน 12 ชม.",
+        long: "กระบอกน้ำแก้วสองชั้นสูญญากาศ ขนาด 750ml ปากกว้างใส่น้ำแข็งได้ ฝาเกลียวแน่น ไม่รั่วซึม",
+        price: 390,
+        emoji: "🍶"
+      },
+      {
+        id: "p14",
+        name: "หมอนหนุนคอเมมโมรี่โฟม",
+        short: "รองรับทรงคอ นอนสบาย ลดอาการปว��คอ",
+        long: "หมอนหนุนเมมโมรี่โฟมคุณภาพสูง ออกแบบตามหลักสรี���ะ ช่วยลดอาการปวดคอ ปลอกหมอนถอดซักได้",
+        price: 590,
+        emoji: "🛏️"
+      },
+      {
+        id: "p15",
+        name: "ไฟ LED แบบพกพา",
+        short: "ปรับความสว่างได้ ชาร์จ USB",
+        long: "��ฟ LED แบบพกพา 3 โหมดแสง ปรับความสว่างได้ แบตเตอรี่ในตัว ชาร์จ USB ใช้งานได้ 8 ชั่วโมง",
+        price: 250,
+        emoji: "💡"
+      },
+      {
+        id: "p16",
+        name: "ชุดแปรงแต่งหน้า 12 ชิ้น",
+        short: "ขนนุ่ม ไม่ระคายผิว พร้อมกระเป๋า",
+        long: "ชุดแปรงแต่งหน้าครบเซ็ต 12 ชิ้น ขนสังเคราะห์คุณภาพสูง นุ่มนวล ไม่ระคายผิว พร้อมกระเป๋าใส���แปรง",
+        price: 490,
+        emoji: "💄"
+      },
+      {
+        id: "p17",
+        name: "เครื่องชงกาแฟแบบพกพา",
+        short: "ชงกาแฟได้ทุกที่ ไม่ต้องใช้ไฟฟ้า",
+        long: "เครื่องชงกาแฟแบบกดมือ ขนาดพกพา ชงได้ทุกที่ ไม่ต้องใช้ไฟฟ้า วัสดุคุณภาพดี ทำความสะอาดง่าย",
+        price: 680,
+        emoji: "☕"
+      },
+      {
+        id: "p18",
+        name: "พัดลมมินิ USB",
+        short: "เย็นสบาย เสียงเงียบ พกพาสะดวก",
+        long: "พัดลมมินิ USB 3 ความเร็ว แบตเตอรี่ในตัว 2000mAh ใช้งานได้ 6 ชั่วโมง ปรับมุมได��� 360 องศา",
+        price: 280,
+        emoji: "🌀"
+      },
+      {
+        id: "p19",
+        name: "กล่องใส่อาหารสูญญากาศ",
+        short: "เก็บอาหารสด ไม่ร���่วซึม ล้างง่าย",
+        long: "กล่องใส่อาหารสูญญากาศ 3 ชิ้น ขนาด 500ml, 800ml, 1200ml ฝาล็อคแน่น ไม่รั่วซึม ใช้ไมโครเวฟได้",
+        price: 420,
+        emoji: "🍱"
+      },
+      {
+        id: "p20",
+        name: "ที่นอนโยคะ TPE",
+        short: "หนา 6mm กันลื่น ไม่มีกลิ่น",
+        long: "ที่นอนโยคะ TPE หนา 6mm พื้น��ิวกันลื่น ไม่มีกลิ่น น้ำหนักเบา พับเก็บง่าย พร้อมสายรัด",
+        price: 590,
+        emoji: "🧘"
+      },
+      {
+        id: "p21",
+        name: "ขาตั้งมือถือแบบยืดหยุ่น",
+        short: "��รับมุมได้ 360 องศา ตั้งโต๊ะหรือหนีบได้",
+        long: "ขาตั้งมือถือแบบยืดหยุ่น ปรับมุมได้รอบทิศทาง หนีบได้แน่น รองรับมือถือ 4-7 นิ้ว เหมาะสำหรับถ่ายคลิป",
+        price: 350,
+        emoji: "📱"
+      },
+      {
+        id: "p22",
+        name: "หมวกกันน็อคจักรยาน",
+        short: "น้ำหนักเบา ระบายอากาศดี ปรับ���นาดได้",
+        long: "หมวกกันน็อคจักรยาน มาตรฐาน CE ระบายอากาศดี น้ำหนักเบา ปรับขนาดได้ พร้อมไฟ LED ด้านหลัง",
+        price: 890,
+        emoji: "🚴"
+      },
+      {
+        id: "p23",
+        name: "กระติกน้ำร้อนสูญญากาศ",
+        short: "เก็บความร้อน 24 ชม. ขนาด 1 ลิตร",
+        long: "กระติกน้ำร้อนสูญญากาศ ขนาด 1 ลิตร เก็บความร้อนได้นาน 24 ชั่วโมง ฝาเป็นถ้วย เทสะดวก",
+        price: 490,
+        emoji: "🫖"
+      },
+      {
+        id: "p24",
+        name: "ชุดไขควงอเนกประสงค์",
+        short: "ครบชุด 25 หัว พกพาสะ���วก",
+        long: "ชุดไขควงอเนกประสงค์ 25 หัว เหมาะสำหรับซ่อมมือถือ แท็บเล็ต แล็ปท็อป วัสดุคุณภาพดี พร้อมกล่องเก็บ",
+        price: 380,
+        emoji: "🔧"
+      },
+      {
+        id: "p25",
+        name: "กระเป๋าเป้กันน้ำ",
+        short: "จุของได้เยอะ มีช่อง USB ชาร์จมือถือ",
+        long: "กระเป๋าเป้กันน้ำ ความจุ 30 ลิตร มีช่อง USB ชาร์จมือถือ ช่องใส่โน้ตบุ๊ค 15.6 นิ้ว สายสะพายนุ่ม",
+        price: 890,
+        emoji: "🎒"
+      },
+      {
+        id: "p26",
+        name: "เครื่องวัดความดันโลหิต",
+        short: "วัดแม่นยำ จอใหญ่ อ่านง่าย",
+        long: "เครื่องวัดความดันโลหิตดิจ��ตอล วัดแม่นยำ จอ LCD ใหญ่ บันทึกค่าได้ 99 ครั้ง พร้อมกระเป๋าใส่",
+        price: 1290,
+        emoji: "🩺"
+      },
+      {
+        id: "p27",
+        name: "ตาชั่งดิจิตอลครั���",
+        short: "ชั่งได้ถึง 5 กก. แม่นยำ 1 กรัม",
+        long: "ตาชั่งดิจิตอลครัว ชั่งได้ 5 กก. แม่นยำ 1 กรัม จอ LCD ใหญ่ ฟังก์ชันชั่งน้ำหนักสุทธิ ปิดอัตโนมัติ",
+        price: 290,
+        emoji: "⚖️"
+      },
+      {
+        id: "p28",
+        name: "ไฟฉายแบบชาร์จไฟได้",
+        short: "แสงสว่างสูง 1000 ลูเมน กันน้ำ",
+        long: "ไฟฉาย LED แสงสว่าง 1000 ลูเมน ชาร์จ USB ได้ กันน้ำ IPX6 ปรับโฟกัสได้ แบตเตอรี่ใช้งาน 10 ชั่วโมง",
+        price: 590,
+        emoji: "🔦"
+      },
+      {
+        id: "p29",
+        name: "หูฟังเกมมิ่ง RGB",
+        short: "เสียงเซอร์ราวด์ 7.1 ไมค์ตัดเสียงรบกวน",
+        long: "หูฟังเกมมิ่ง เสียงเซอร์ราวด์ 7.1 ไฟ RGB ปรับได้ ไมค์ตัดเสียงรบกวน น้ำหนักเบา สวมใส่สบาย",
+        price: 1190,
+        emoji: "🎮"
+      },
+      {
+        id: "p30",
+        name: "แผ่นรองเมาส์ขนาดใหญ่",
+        short: "ขนาด 80x40cm พื้นผิวเรียบ ขอบเย็บ",
+        long: "แผ่นรองเมาส์ขนาดใหญ่ 80x40cm พื้นผิวเรียบลื่น ฐานยางกันลื่น ขอบเย็บแน่น ทนทาน ล้างทำความสะอาดได้",
+        price: 390,
+        emoji: "🖥️"
+      }
+    ];
+
+    let cart = [];
+    let currentDetailId = null;
+
+    function formatCurrency(num) {
+      return "฿" + num.toLocaleString("th-TH");
+    }
+
+    function showSection(id) {
+      const sections = [
+        "section-home",
+        "section-detail",
+        "section-cart",
+        "section-login",
+        "section-register",
+        "section-seller-register",
+        "section-profile",
+        "section-address-form",
+        "section-checkout",
+        "section-admin",
+        "section-admin-products",
+        "section-admin-orders",
+        "section-admin-users"
+      ];
+      sections.forEach((sid) => {
+        const el = document.getElementById(sid);
+        if (!el) return;
+        if (sid === id) {
+          el.classList.remove("hidden");
+        } else {
+          el.classList.add("hidden");
+        }
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      const inner = document.getElementById("toast-inner");
+      if (!toast || !inner) return;
+      inner.textContent = msg;
+      toast.style.opacity = "1";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+      }, 1800);
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById("product-grid");
+      if (!grid) return;
+      grid.innerHTML = "";
+
+      products.forEach((p) => {
+        const card = document.createElement("article");
+        card.className =
+          "rounded-2xl bg-[#020617] border border-sky-900/60 shadow-lg overflow-hidden flex flex-col text-xs";
+        card.setAttribute("data-id", p.id);
+
+        const visual = document.createElement("div");
+        visual.className =
+          "h-28 flex items-center justify-center bg-gradient-to-br from-sky-500/40 via-sky-700/40 to-sky-900/60";
+        visual.setAttribute("aria-hidden", "true");
+        const emojiSpan = document.createElement("span");
+        emojiSpan.textContent = p.emoji;
+        emojiSpan.className = "text-4xl";
+        visual.appendChild(emojiSpan);
+
+        const body = document.createElement("div");
+        body.className = "flex-1 p-3 flex flex-col gap-1";
+
+        const nameRow = document.createElement("div");
+        nameRow.className = "flex items-start justify-between gap-2";
+
+        const nameEl = document.createElement("h3");
+        nameEl.className = "text-[13px] font-semibold text-white";
+        nameEl.textContent = p.name;
+
+        const priceEl = document.createElement("p");
+        priceEl.className = "text-xs font-bold text-sky-300";
+        priceEl.textContent = formatCurrency(p.price);
+
+        nameRow.appendChild(nameEl);
+        nameRow.appendChild(priceEl);
+
+        const shortEl = document.createElement("p");
+        shortEl.className = "text-[11px] text-slate-300 line-clamp-2";
+        shortEl.textContent = p.short;
+
+        const btnRow = document.createElement("div");
+        btnRow.className =
+          "mt-2 flex items-center justify-between gap-2 text-[11px]";
+
+        const detailBtn = document.createElement("button");
+        detailBtn.type = "button";
+        detailBtn.className =
+          "flex-1 rounded-xl border border-sky-800 bg-slate-900/60 px-2 py-1 text-[11px] text-sky-200 hover:bg-slate-900";
+        detailBtn.textContent = "ดูรายละเอียด";
+
+        const addBtn = document.createElement("button");
+        addBtn.type = "button";
+        addBtn.className =
+          "flex-1 rounded-xl bg-[#0ea5e9] px-2 py-1 text-[11px] font-semibold text-white hover:bg-[#0284c7]";
+        addBtn.textContent = "+ เพิ่มลงตะกร้า";
+
+        detailBtn.addEventListener("click", () => {
+          openDetail(p.id);
+        });
+        addBtn.addEventListener("click", () => {
+          addToCart(p.id);
+          showToast("เพิ่ม \"" + p.name + "\" ลงในตะกร้าแล้ว");
+        });
+
+        btnRow.appendChild(detailBtn);
+        btnRow.appendChild(addBtn);
+
+        body.appendChild(nameRow);
+        body.appendChild(shortEl);
+        body.appendChild(btnRow);
+
+        card.appendChild(visual);
+        card.appendChild(body);
+
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(productId) {
+      const item = cart.find((c) => c.id === productId);
+      if (item) {
+        item.qty += 1;
+      } else {
+        cart.push({ id: productId, qty: 1 });
+      }
+      updateCartUI();
+    }
+
+    function updateCartItem(productId, delta) {
+      const item = cart.find((c) => c.id === productId);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter((c) => c.id !== productId);
+      }
+      updateCartUI();
+    }
+
+    function getCartStats() {
+      let totalQty = 0;
+      let totalPrice = 0;
+      cart.forEach((item) => {
+        const p = products.find((x) => x.id === item.id);
+        if (!p) return;
+        totalQty += item.qty;
+        totalPrice += p.price * item.qty;
+      });
+      return { totalQty, totalPrice };
+    }
+
+    function updateCartUI() {
+      const { totalQty, totalPrice } = getCartStats();
+
+      const badge = document.getElementById("cart-count-badge");
+      if (badge) badge.textContent = totalQty;
+
+      const emptyState = document.getElementById("cart-empty-state");
+      const cartList = document.getElementById("cart-list");
+      const cartActions = document.getElementById("cart-actions");
+      const cartTotalPrice = document.getElementById("cart-total-price");
+
+      if (!emptyState || !cartList) return;
+
+      if (totalQty === 0) {
+        emptyState.classList.remove("hidden");
+        cartList.innerHTML = "";
+        if (cartActions) cartActions.classList.add("hidden");
+      } else {
+        emptyState.classList.add("hidden");
+        if (cartActions) cartActions.classList.remove("hidden");
+        if (cartTotalPrice) cartTotalPrice.textContent = formatCurrency(totalPrice);
+
+        cartList.innerHTML = "";
+
+        cart.forEach((item) => {
+          const p = products.find((x) => x.id === item.id);
+          if (!p) return;
+
+          const row = document.createElement("article");
+          row.className =
+            "rounded-2xl bg-[#020617] border border-sky-900/60 px-3 py-3 flex items-start gap-3 text-xs";
+
+          const visual = document.createElement("div");
+          visual.className =
+            "w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500/40 via-sky-700/40 to-sky-900/60 flex items-center justify-center flex-shrink-0";
+          const emojiSpan = document.createElement("span");
+          emojiSpan.textContent = p.emoji;
+          emojiSpan.className = "text-2xl";
+          visual.appendChild(emojiSpan);
+
+          const info = document.createElement("div");
+          info.className = "flex-1 flex flex-col gap-1";
+
+          const topRow = document.createElement("div");
+          topRow.className = "flex items-start justify-between gap-2";
+
+          const namePrice = document.createElement("div");
+          namePrice.className = "flex flex-col gap-0.5";
+
+          const nameEl = document.createElement("p");
+          nameEl.className = "text-[13px] font-semibold text-white";
+          nameEl.textContent = p.name;
+
+          const priceEl = document.createElement("p");
+          priceEl.className = "text-[11px] text-sky-300";
+          priceEl.textContent = formatCurrency(p.price);
+
+          namePrice.appendChild(nameEl);
+          namePrice.appendChild(priceEl);
+
+          const lineTotal = document.createElement("p");
+          lineTotal.className = "text-[11px] font-semibold text-sky-200";
+          lineTotal.textContent = formatCurrency(p.price * item.qty);
+
+          topRow.appendChild(namePrice);
+          topRow.appendChild(lineTotal);
+
+          const qtyRow = document.createElement("div");
+          qtyRow.className =
+            "mt-1 flex items-center justify-between gap-2 text-[11px]";
+
+          const qtyControls = document.createElement("div");
+          qtyControls.className =
+            "inline-flex items-center gap-1 rounded-full bg-slate-900/70 px-1 py-0.5";
+
+          const minusBtn = document.createElement("button");
+          minusBtn.type = "button";
+          minusBtn.className =
+            "w-6 h-6 flex items-center justify-center rounded-full text-slate-100 hover:bg-slate-800";
+          minusBtn.textContent = "−";
+
+          const qtyText = document.createElement("span");
+          qtyText.className = "min-w-[18px] text-center";
+          qtyText.textContent = item.qty;
+
+          const plusBtn = document.createElement("button");
+          plusBtn.type = "button";
+          plusBtn.className =
+            "w-6 h-6 flex items-center justify-center rounded-full text-slate-100 hover:bg-slate-800";
+          plusBtn.textContent = "+";
+
+          minusBtn.addEventListener("click", () => {
+            updateCartItem(p.id, -1);
+          });
+          plusBtn.addEventListener("click", () => {
+            updateCartItem(p.id, 1);
+          });
+
+          qtyControls.appendChild(minusBtn);
+          qtyControls.appendChild(qtyText);
+          qtyControls.appendChild(plusBtn);
+
+          const removeBtn = document.createElement("button");
+          removeBtn.type = "button";
+          removeBtn.className =
+            "text-[11px] text-rose-300 hover:text-rose-200";
+          removeBtn.textContent = "ลบออก";
+          removeBtn.addEventListener("click", () => {
+            cart = cart.filter((c) => c.id !== p.id);
+            updateCartUI();
+          });
+
+          qtyRow.appendChild(qtyControls);
+          qtyRow.appendChild(removeBtn);
+
+          info.appendChild(topRow);
+          info.appendChild(qtyRow);
+
+          row.appendChild(visual);
+          row.appendChild(info);
+
+          cartList.appendChild(row);
+        });
+      }
+
+      renderCheckoutSummary();
+    }
+
+    function openDetail(productId) {
+      const p = products.find((x) => x.id === productId);
+      if (!p) return;
+      currentDetailId = p.id;
+      const nameEl = document.getElementById("detail-name");
+      const shortEl = document.getElementById("detail-short");
+      const longEl = document.getElementById("detail-long");
+      const priceEl = document.getElementById("detail-price");
+      const emojiEl = document.getElementById("detail-emoji");
+
+      if (nameEl) nameEl.textContent = p.name;
+      if (shortEl) shortEl.textContent = p.short;
+      if (longEl) longEl.textContent = p.long;
+      if (priceEl) priceEl.textContent = formatCurrency(p.price);
+      if (emojiEl) emojiEl.textContent = p.emoji;
+
+      showSection("section-detail");
+    }
+
+    function renderCheckoutSummary() {
+      const container = document.getElementById("checkout-summary-items");
+      const totalEl = document.getElementById("checkout-total");
+      if (!container || !totalEl) return;
+
+      const { totalQty, totalPrice } = getCartStats();
+      container.innerHTML = "";
+
+      if (totalQty === 0) {
+        const p = document.createElement("p");
+        p.className = "text-xs text-slate-300";
+        p.textContent = "ยังไม่มีสินค้าในตะกร้า";
+        container.appendChild(p);
+        totalEl.textContent = formatCurrency(0);
+        return;
+      }
+
+      cart.forEach((item) => {
+        const prod = products.find((x) => x.id === item.id);
+        if (!prod) return;
+        const row = document.createElement("div");
+        row.className = "flex items-center justify-between gap-2";
+
+        const nameQty = document.createElement("div");
+        nameQty.className = "flex items-center gap-2";
+
+        const dot = document.createElement("span");
+        dot.className = "text-[13px]";
+        dot.textContent = "•";
+
+        const label = document.createElement("span");
+        label.className = "text-xs text-slate-200";
+        label.textContent = prod.name + " × " + item.qty;
+
+        nameQty.appendChild(dot);
+        nameQty.appendChild(label);
+
+        const lineTotal = document.createElement("span");
+        lineTotal.className = "text-xs text-sky-300";
+        lineTotal.textContent = formatCurrency(prod.price * item.qty);
+
+        row.appendChild(nameQty);
+        row.appendChild(lineTotal);
+
+        container.appendChild(row);
+      });
+
+      totalEl.textContent = formatCurrency(totalPrice);
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const form = e.target;
+      const email = form.login_email.value.trim();
+      const password = form.login_password.value.trim();
+
+      if (!email || !password) {
+        showToast("กรุณากรอกอีเมลและรหัสผ่าน");
+        return;
+      }
+
+      // Check if admin login
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        isLoggedIn = true;
+        isAdmin = true;
+        currentUser = {
+          name: "ผู้ดูแลระบบ",
+          email: email,
+          phone: "",
+          fullname: "Admin"
+        };
+        showSection("section-admin");
+        showToast("เข้าสู่ระบบแอดมินสำเร็จ!");
+        form.reset();
+        renderAdminProducts();
+        return;
+      }
+
+      // Simulate regular user login
+      isLoggedIn = true;
+      isAdmin = false;
+      currentUser = {
+        name: "ผู้ใช้งาน",
+        email: email,
+        phone: "",
+        fullname: ""
+      };
+
+      updateProfileUI();
+      showSection("section-profile");
+      showToast("เข้าสู่ระบบสำเร็จ!");
+      form.reset();
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const form = e.target;
+      const name = form.register_name.value.trim();
+      const email = form.register_email.value.trim();
+      const phone = form.register_phone.value.trim();
+      const password = form.register_password.value.trim();
+      const confirmPassword = form.register_confirm_password.value.trim();
+
+      if (!name || !email || !phone || !password || !confirmPassword) {
+        showToast("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showToast("รหัสผ่านไม่ตรงกัน");
+        return;
+      }
+
+      // Simulate registration
+      isLoggedIn = true;
+      currentUser = {
+        name: name,
+        email: email,
+        phone: phone,
+        fullname: name
+      };
+
+      updateProfileUI();
+      showSection("section-profile");
+      showToast("สมัครสมาชิกส��เร็จ!");
+      form.reset();
+    }
+
+    function handleSellerRegister(e) {
+      e.preventDefault();
+      const form = e.target;
+      const shopName = form.seller_shop_name.value.trim();
+      const name = form.seller_name.value.trim();
+      const email = form.seller_email.value.trim();
+      const phone = form.seller_phone.value.trim();
+      const address = form.seller_address.value.trim();
+      const password = form.seller_password.value.trim();
+      const confirmPassword = form.seller_confirm_password.value.trim();
+
+      if (!shopName || !name || !email || !phone || !address || !password || !confirmPassword) {
+        showToast("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showToast("รหัสผ่านไม่ตรงกัน");
+        return;
+      }
+
+      // Simulate seller registration
+      showToast("สมัครเป็นผู้ขายสำเร็จ! กำลังตรวจสอบข้อมูล...");
+      form.reset();
+      
+      setTimeout(() => {
+        showSection("section-login");
+        showToast("ระบบจะแจ้งผลการอนุมัติภายใน 1-2 วันทำการ");
+      }, 2000);
+    }
+
+    function handleLogout() {
+      isLoggedIn = false;
+      isAdmin = false;
+      currentUser = null;
+      savedAddresses = [];
+      selectedAddressId = null;
+      showSection("section-login");
+      showToast("ออกจากระบบแล้ว");
+    }
+
+    function renderAdminProducts() {
+      const container = document.getElementById("admin-products-list");
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      products.forEach((p) => {
+        const card = document.createElement("article");
+        card.className = "rounded-2xl bg-[#020617] border border-sky-900/60 px-4 py-3 flex items-start gap-3";
+
+        const visual = document.createElement("div");
+        visual.className = "w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500/40 via-sky-700/40 to-sky-900/60 flex items-center justify-center flex-shrink-0";
+        const emojiSpan = document.createElement("span");
+        emojiSpan.textContent = p.emoji;
+        emojiSpan.className = "text-2xl";
+        visual.appendChild(emojiSpan);
+
+        const info = document.createElement("div");
+        info.className = "flex-1 space-y-1";
+
+        const nameRow = document.createElement("div");
+        nameRow.className = "flex items-start justify-between gap-2";
+
+        const name = document.createElement("p");
+        name.className = "text-xs font-semibold text-white";
+        name.textContent = p.name;
+
+        const price = document.createElement("p");
+        price.className = "text-xs font-bold text-sky-300";
+        price.textContent = formatCurrency(p.price);
+
+        nameRow.appendChild(name);
+        nameRow.appendChild(price);
+
+        const short = document.createElement("p");
+        short.className = "text-[11px] text-slate-300";
+        short.textContent = p.short;
+
+        const actions = document.createElement("div");
+        actions.className = "mt-2 flex items-center gap-2";
+
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "flex-1 rounded-xl border border-sky-800 bg-slate-900/60 px-3 py-1.5 text-[11px] text-sky-200 hover:bg-slate-900";
+        editBtn.textContent = "แก้ไข";
+        editBtn.addEventListener("click", () => {
+          showToast("ฟีเจอร์แก้ไขสินค้า (ตัวอย่าง)");
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "flex-1 rounded-xl border border-rose-800 bg-rose-900/20 px-3 py-1.5 text-[11px] text-rose-300 hover:bg-rose-900/40";
+        deleteBtn.textContent = "ลบ";
+        deleteBtn.addEventListener("click", () => {
+          showToast("ฟีเจอร์ลบสินค้า (ตัวอย่าง)");
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        info.appendChild(nameRow);
+        info.appendChild(short);
+        info.appendChild(actions);
+
+        card.appendChild(visual);
+        card.appendChild(info);
+
+        container.appendChild(card);
+      });
+    }
+
+    function updateProfileUI() {
+      if (!currentUser) return;
+
+      const profileName = document.getElementById("profile-name");
+      const profileEmail = document.getElementById("profile-email");
+      const profileFullname = document.getElementById("profile-fullname");
+      const profilePhone = document.getElementById("profile-phone");
+
+      if (profileName) profileName.textContent = currentUser.name || "ผู้ใช้งาน";
+      if (profileEmail) profileEmail.textContent = currentUser.email || "";
+      if (profileFullname) profileFullname.textContent = currentUser.fullname || "ยังไม่ได้ระบุ";
+      if (profilePhone) profilePhone.textContent = currentUser.phone || "ยังไม่ได้ระบุ";
+
+      renderSavedAddresses();
+    }
+
+    function renderSavedAddresses() {
+      const container = document.getElementById("saved-addresses-list");
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      if (savedAddresses.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "text-center py-4";
+        empty.innerHTML = `
+          <p class="text-xs text-slate-300">ยังไม่มีที่อยู่ที่บันทึกไว้</p>
+          <p class="text-[11px] text-slate-400 mt-1">เพิ่มที่อยู่เพื่อความสะดวกในการสั่งซื้อ</p>
+        `;
+        container.appendChild(empty);
+        return;
+      }
+
+      savedAddresses.forEach((addr) => {
+        const card = document.createElement("div");
+        card.className = "rounded-xl border border-sky-900/60 bg-slate-900/40 px-3 py-2 space-y-1";
+
+        const header = document.createElement("div");
+        header.className = "flex items-center justify-between";
+
+        const label = document.createElement("p");
+        label.className = "text-xs font-semibold text-sky-200";
+        label.textContent = addr.label;
+
+        const actions = document.createElement("div");
+        actions.className = "flex items-center gap-2";
+
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "text-[11px] text-sky-300 hover:text-sky-200";
+        editBtn.textContent = "แก้ไข";
+        editBtn.addEventListener("click", () => {
+          openAddressForm(addr.id);
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "text-[11px] text-rose-300 hover:text-rose-200";
+        deleteBtn.textContent = "ลบ";
+        deleteBtn.addEventListener("click", () => {
+          deleteAddress(addr.id);
+        });
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+
+        header.appendChild(label);
+        header.appendChild(actions);
+
+        const name = document.createElement("p");
+        name.className = "text-[11px] text-slate-200";
+        name.textContent = addr.name;
+
+        const phone = document.createElement("p");
+        phone.className = "text-[11px] text-slate-300";
+        phone.textContent = addr.phone;
+
+        const detail = document.createElement("p");
+        detail.className = "text-[11px] text-slate-300";
+        detail.textContent = addr.detail;
+
+        card.appendChild(header);
+        card.appendChild(name);
+        card.appendChild(phone);
+        card.appendChild(detail);
+
+        container.appendChild(card);
+      });
+    }
+
+    function renderCheckoutAddresses() {
+      const container = document.getElementById("checkout-address-list");
+      if (!container) return;
+
+      container.innerHTML = "";
+
+      if (savedAddresses.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "text-center py-4";
+        empty.innerHTML = `
+          <p class="text-xs text-slate-300">ยังไม่มีที่อยู่ที่บันทึกไว้</p>
+          <p class="text-[11px] text-slate-400 mt-1">กรุณาเพิ่มที่อยู่เพื่อดำเนินการต่อ</p>
+        `;
+        container.appendChild(empty);
+        return;
+      }
+
+      savedAddresses.forEach((addr) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = "w-full text-left rounded-xl border px-3 py-2 space-y-1 transition-colors";
+        
+        if (selectedAddressId === addr.id) {
+          card.className += " border-sky-400 bg-sky-900/30";
+        } else {
+          card.className += " border-sky-900/60 bg-slate-900/40 hover:border-sky-700";
+        }
+
+        card.addEventListener("click", () => {
+          selectedAddressId = addr.id;
+          renderCheckoutAddresses();
+        });
+
+        const label = document.createElement("p");
+        label.className = "text-xs font-semibold text-sky-200";
+        label.textContent = addr.label;
+
+        const name = document.createElement("p");
+        name.className = "text-[11px] text-slate-200";
+        name.textContent = addr.name;
+
+        const phone = document.createElement("p");
+        phone.className = "text-[11px] text-slate-300";
+        phone.textContent = addr.phone;
+
+        const detail = document.createElement("p");
+        detail.className = "text-[11px] text-slate-300";
+        detail.textContent = addr.detail;
+
+        card.appendChild(label);
+        card.appendChild(name);
+        card.appendChild(phone);
+        card.appendChild(detail);
+
+        container.appendChild(card);
+      });
+    }
+
+    function openAddressForm(addressId = null) {
+      editingAddressId = addressId;
+      const form = document.getElementById("address-form");
+      const title = document.getElementById("address-form-title");
+
+      if (addressId) {
+        const addr = savedAddresses.find((a) => a.id === addressId);
+        if (addr) {
+          title.textContent = "แก้ไขที่อยู่";
+          form.address_label.value = addr.label;
+          form.address_name.value = addr.name;
+          form.address_phone.value = addr.phone;
+          form.address_detail.value = addr.detail;
+        }
+      } else {
+        title.textContent = "เพิ่มที่อยู่ใหม่";
+        form.reset();
+      }
+
+      showSection("section-address-form");
+    }
+
+    function handleAddressSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const label = form.address_label.value.trim();
+      const name = form.address_name.value.trim();
+      const phone = form.address_phone.value.trim();
+      const detail = form.address_detail.value.trim();
+
+      if (!label || !name || !phone || !detail) {
+        showToast("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+        return;
+      }
+
+      if (editingAddressId) {
+        // Edit existing
+        const addr = savedAddresses.find((a) => a.id === editingAddressId);
+        if (addr) {
+          addr.label = label;
+          addr.name = name;
+          addr.phone = phone;
+          addr.detail = detail;
+          showToast("แก้ไขที่อยู่สำเร็จ!");
+        }
+      } else {
+        // Add new
+        const newAddr = {
+          id: "addr_" + Date.now(),
+          label,
+          name,
+          phone,
+          detail
+        };
+        savedAddresses.push(newAddr);
+        showToast("เพิ่มที่อยู่สำเร็จ!");
+      }
+
+      editingAddressId = null;
+      form.reset();
+      renderSavedAddresses();
+      showSection("section-profile");
+    }
+
+    function deleteAddress(addressId) {
+      savedAddresses = savedAddresses.filter((a) => a.id !== addressId);
+      if (selectedAddressId === addressId) {
+        selectedAddressId = null;
+      }
+      renderSavedAddresses();
+      showToast("ลบที่อยู่แล้ว");
+    }
+
+    function handleFakeOrderSubmit() {
+      if (!selectedAddressId) {
+        showToast("กรุณาเลือกที่อยู่จัดส่ง");
+        return;
+      }
+
+      const { totalQty } = getCartStats();
+      if (totalQty === 0) {
+        showToast("ยังไม่มีสินค้าในตะกร้า");
+        return;
+      }
+
+      showToast("ระบบบันทึกคำสั่งซื้อ (ตัวอย่าง) เรียบร้อยแล้ว");
+      cart = [];
+      selectedAddressId = null;
+      updateCartUI();
+      showSection("section-home");
+    }
+
+    function initEvents() {
+      const homeIcon = document.getElementById("home-icon-btn");
+      const cartIcon = document.getElementById("cart-icon-btn");
+      const profileIcon = document.getElementById("profile-icon-btn");
+      const backDetail = document.getElementById("back-to-home-from-detail");
+      const backCart = document.getElementById("back-to-home-from-cart");
+      const backFromCheckout = document.getElementById("back-to-cart-from-checkout");
+      const backFromAddress = document.getElementById("back-to-profile-from-address");
+      const backFromSeller = document.getElementById("back-to-login-from-seller");
+
+      const footerHomeBtn = document.getElementById("footer-home-btn");
+      const footerProfileBtn = document.getElementById("footer-profile-btn");
+
+      const proceedToCheckoutBtn = document.getElementById("proceed-to-checkout-btn");
+      const placeOrderBtn = document.getElementById("place-order-btn");
+
+      const goToRegister = document.getElementById("go-to-register");
+      const goToSellerRegister = document.getElementById("go-to-seller-register");
+      const goToLogin = document.getElementById("go-to-login");
+      const goToLoginFromSeller = document.getElementById("go-to-login-from-seller");
+      const logoutBtn = document.getElementById("logout-btn");
+
+      const loginForm = document.getElementById("login-form");
+      const registerForm = document.getElementById("register-form");
+      const sellerRegisterForm = document.getElementById("seller-register-form");
+      const addressForm = document.getElementById("address-form");
+
+      const addAddressBtn = document.getElementById("add-address-btn");
+      const addAddressFromCheckoutBtn = document.getElementById("add-address-from-checkout-btn");
+      const cancelAddressBtn = document.getElementById("cancel-address-btn");
+
+      // Admin buttons
+      const adminManageProductsBtn = document.getElementById("admin-manage-products-btn");
+      const adminManageOrdersBtn = document.getElementById("admin-manage-orders-btn");
+      const adminManageUsersBtn = document.getElementById("admin-manage-users-btn");
+      const adminSettingsBtn = document.getElementById("admin-settings-btn");
+      const adminLogoutBtn = document.getElementById("admin-logout-btn");
+      const adminAddProductBtn = document.getElementById("admin-add-product-btn");
+      const backToAdminFromProducts = document.getElementById("back-to-admin-from-products");
+      const backToAdminFromOrders = document.getElementById("back-to-admin-from-orders");
+      const backToAdminFromUsers = document.getElementById("back-to-admin-from-users");
+
+      if (homeIcon) {
+        homeIcon.addEventListener("click", () => {
+          showSection("section-home");
+        });
+      }
+      if (cartIcon) {
+        cartIcon.addEventListener("click", () => {
+          showSection("section-cart");
+        });
+      }
+      if (profileIcon) {
+        profileIcon.addEventListener("click", () => {
+          if (isLoggedIn) {
+            showSection("section-profile");
+          } else {
+            showSection("section-login");
+          }
+        });
+      }
+      if (backDetail) {
+        backDetail.addEventListener("click", () => {
+          showSection("section-home");
+        });
+      }
+      if (backCart) {
+        backCart.addEventListener("click", () => {
+          showSection("section-home");
+        });
+      }
+      if (backFromCheckout) {
+        backFromCheckout.addEventListener("click", () => {
+          showSection("section-cart");
+        });
+      }
+      if (backFromAddress) {
+        backFromAddress.addEventListener("click", () => {
+          showSection("section-profile");
+        });
+      }
+      if (backFromSeller) {
+        backFromSeller.addEventListener("click", () => {
+          showSection("section-login");
+        });
+      }
+
+      if (footerHomeBtn) {
+        footerHomeBtn.addEventListener("click", () => {
+          showSection("section-home");
+        });
+      }
+      if (footerProfileBtn) {
+        footerProfileBtn.addEventListener("click", () => {
+          if (isLoggedIn) {
+            showSection("section-profile");
+          } else {
+            showSection("section-login");
+          }
+        });
+      }
+
+      if (proceedToCheckoutBtn) {
+        proceedToCheckoutBtn.addEventListener("click", () => {
+          if (!isLoggedIn) {
+            showToast("กรุณาเข้าสู่ระบบก่อนชำระเงิน");
+            showSection("section-login");
+            return;
+          }
+          renderCheckoutAddresses();
+          showSection("section-checkout");
+        });
+      }
+
+      if (placeOrderBtn) {
+        placeOrderBtn.addEventListener("click", () => {
+          handleFakeOrderSubmit();
+        });
+      }
+
+      const detailAddBtn = document.getElementById("detail-add-to-cart");
+      if (detailAddBtn) {
+        detailAddBtn.addEventListener("click", () => {
+          if (!currentDetailId) return;
+          const prod = products.find((p) => p.id === currentDetailId);
+          addToCart(currentDetailId);
+          if (prod) {
+            showToast("เพิ่ม \"" + prod.name + "\" ลงในตะกร้าแล้ว");
+          }
+        });
+      }
+
+      if (goToRegister) {
+        goToRegister.addEventListener("click", () => {
+          showSection("section-register");
+        });
+      }
+
+      if (goToSellerRegister) {
+        goToSellerRegister.addEventListener("click", () => {
+          showSection("section-seller-register");
+        });
+      }
+
+      if (goToLogin) {
+        goToLogin.addEventListener("click", () => {
+          showSection("section-login");
+        });
+      }
+
+      if (goToLoginFromSeller) {
+        goToLoginFromSeller.addEventListener("click", () => {
+          showSection("section-login");
+        });
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", () => {
+          handleLogout();
+        });
+      }
+
+      if (loginForm) {
+        loginForm.addEventListener("submit", handleLogin);
+      }
+
+      if (registerForm) {
+        registerForm.addEventListener("submit", handleRegister);
+      }
+
+      if (sellerRegisterForm) {
+        sellerRegisterForm.addEventListener("submit", handleSellerRegister);
+      }
+
+      if (addressForm) {
+        addressForm.addEventListener("submit", handleAddressSubmit);
+      }
+
+      if (addAddressBtn) {
+        addAddressBtn.addEventListener("click", () => {
+          openAddressForm();
+        });
+      }
+
+      if (addAddressFromCheckoutBtn) {
+        addAddressFromCheckoutBtn.addEventListener("click", () => {
+          openAddressForm();
+        });
+      }
+
+      if (cancelAddressBtn) {
+        cancelAddressBtn.addEventListener("click", () => {
+          showSection("section-profile");
+        });
+      }
+
+      // Admin event listeners
+      if (adminManageProductsBtn) {
+        adminManageProductsBtn.addEventListener("click", () => {
+          renderAdminProducts();
+          showSection("section-admin-products");
+        });
+      }
+
+      if (adminManageOrdersBtn) {
+        adminManageOrdersBtn.addEventListener("click", () => {
+          showSection("section-admin-orders");
+        });
+      }
+
+      if (adminManageUsersBtn) {
+        adminManageUsersBtn.addEventListener("click", () => {
+          showSection("section-admin-users");
+        });
+      }
+
+      if (adminSettingsBtn) {
+        adminSettingsBtn.addEventListener("click", () => {
+          showToast("ฟีเจอร์ตั้งค่าระบบ (ตัวอย่าง)");
+        });
+      }
+
+      if (adminLogoutBtn) {
+        adminLogoutBtn.addEventListener("click", () => {
+          handleLogout();
+        });
+      }
+
+      if (adminAddProductBtn) {
+        adminAddProductBtn.addEventListener("click", () => {
+          showToast("ฟีเจอร์เพิ่มสินค้า (ตัวอย่าง)");
+        });
+      }
+
+      if (backToAdminFromProducts) {
+        backToAdminFromProducts.addEventListener("click", () => {
+          showSection("section-admin");
+        });
+      }
+
+      if (backToAdminFromOrders) {
+        backToAdminFromOrders.addEventListener("click", () => {
+          showSection("section-admin");
+        });
+      }
+
+      if (backToAdminFromUsers) {
+        backToAdminFromUsers.addEventListener("click", () => {
+          showSection("section-admin");
+        });
+      }
+    }
+
+    // Initialize view
+    renderProducts();
+    updateCartUI();
+    initEvents();
+    applyConfigToUI(defaultConfig);
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a4ddf9473888829',t:'MTc2NDIwNzE2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
